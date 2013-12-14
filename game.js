@@ -5,7 +5,12 @@
 //some stuff for node.js
 var util = require("util");
 	io = require("socket.io"),
-	Player = require("./Player").Player;
+	Player = require("./Player").Player,
+	gameport        = process.env.PORT || 4004,
+	express         = require('express'), //express framework 
+	http            = require('http'),
+	app             = express(),
+    server          = http.createServer(app);
 	
 //core game variables
 var socket, players;
@@ -16,11 +21,16 @@ function init(){
 	players = [];
 	
 	//configuration for socket.io *************************
-	socket = io.listen(8000);
+	socket = io.listen(gameport);
 	socket.configure(function(){
 		socket.set("transports", ["websocket"]); //set it to use websockets
 		socket.set("log level", 2);
 	});
+	
+	app.get( '/', function( req, res ){
+        console.log('trying to load %s', __dirname + '/public/index.html');
+        res.sendfile( '/public/index.html' , { root:__dirname });
+    });
 	
 	//listen for related events
 	setEventHandlers();
