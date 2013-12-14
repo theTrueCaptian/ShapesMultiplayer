@@ -1,16 +1,16 @@
 //Maeda Hanafi
 //Game server file
 
-
 //some stuff for node.js
 var util = require("util");
 	io = require("socket.io"),
 	Player = require("./Player").Player,
-	gameport        = process.env.PORT || 4004,
+	gameport        = process.env.PORT || 8000,
 	express         = require('express'), //express framework 
 	http            = require('http'),
 	app             = express(),
-    server          = http.createServer(app);
+    server          = http.createServer(app),
+	verbose         = false;
 	
 //core game variables
 var socket, players;
@@ -20,16 +20,41 @@ function init(){
 	//initializing the players variable to an empty array
 	players = [];
 	
-	//configuration for socket.io *************************
-	socket = io.listen(gameport);
-	socket.configure(function(){
-		socket.set("transports", ["websocket"]); //set it to use websockets
-		socket.set("log level", 2);
-	});
+	//The express server handles passing our content to the browser,****************************8
+	 //Tell the server to listen for incoming connections
+    server.listen(gameport)
 	
+	//app should send index.html to the user
 	app.get( '/', function( req, res ){
-        console.log('trying to load %s', __dirname + '/public/index.html');
-        res.sendfile( '/public/index.html' , { root:__dirname });
+        console.log('trying to load %s', __dirname + '/index.html');
+        res.sendfile( '/index.html' , { root:__dirname });
+    });
+	
+	//This handler will listen for requests on /*, any file from the root of our server.
+    app.get( '/*' , function( req, res, next ) {
+
+            //This is the current file they have requested
+        var file = req.params[0];
+
+            //For debugging, we can track what files are requested.
+        if(verbose) console.log('\t :: Express :: file requested : ' + file);
+
+            //Send the requesting client the file.
+        res.sendfile( __dirname + '/' + file );
+
+    });
+	
+	//configuration for socket.io *************************
+	socket = io.listen(server);
+	
+	socket.configure(function (){
+
+        socket.set('log level', 2);
+
+        socket.set('authorization', function (handshakeData, callback) {
+          callback(null, true); // error first callback style
+        });
+
     });
 	
 	//listen for related events
@@ -40,8 +65,7 @@ function init(){
 var setEventHandlers = function(){
 	//listening for new connections to socket.io, which then calls onSocketConnection function
 	socket.sockets.on("connection", onSocketConnection);
-	//io.sockets("connection", onSocketConnection);
-	//socket.io.on("connection", onSocketConnection);
+	
 };
 
 //function called when cnnnection recieved
