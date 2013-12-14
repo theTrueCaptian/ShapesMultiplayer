@@ -1,3 +1,5 @@
+//client version of game.js
+
 /**************************************************
 ** GAME VARIABLES
 **************************************************/
@@ -114,14 +116,15 @@ function onMovePlayer(data) {
 };
 
 function onRemovePlayer(data) {
-	var removePlayer = playerById(this.id);
+	var removePlayer = playerById(data.id);
+	console.log("I am told to remove this player: "+data.id);
 	//make sure that the player is found
 	if(!removePlayer){
-		console.log("PLayer not found: "+this.id);
+		console.log("PLayer not found: "+data.id);
 		return;
 	};
 	//removing player from array
-	players.splice(remotePlayers.indexOf(removePlayer), 1);
+	remotePlayers.splice(remotePlayers.indexOf(removePlayer), 1);
 	
 };
 

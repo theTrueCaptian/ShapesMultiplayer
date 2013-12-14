@@ -89,6 +89,7 @@ function onClientDisconnect(){
 	//removing player from array
 	players.splice(players.indexOf(removePlayer), 1);
 	//let the rst of player know someone disconnected
+	util.log("sending message to the rest of players of a removed player:"+this.id);
 	this.broadcast.emit("remove player", {id: this.id});
 };
 function onNewPlayer(data){
@@ -122,9 +123,7 @@ function onMovePlayer(data){
 	
 	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY()});
 };
-function onRemovePlayer(data) {
-	
-};
+
 function playerById(id){
 	var i;
 	for(i=0; i<players.length; i++){
