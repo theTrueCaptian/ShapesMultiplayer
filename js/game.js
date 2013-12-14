@@ -117,7 +117,7 @@ function onRemovePlayer(data) {
 	var removePlayer = playerById(this.id);
 	//make sure that the player is found
 	if(!removePlayer){
-		util.log("PLayer not found: "+this.id);
+		console.log("PLayer not found: "+this.id);
 		return;
 	};
 	//removing player from array
