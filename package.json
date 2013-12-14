@@ -1,0 +1,16 @@
+{
+  "name": "node-example",
+  "version": "0.0.1",
+  "author" : "Maeda Hanafi",
+  "description": "CSC536 Final Project",
+  "dependencies": {
+    "express": "3.1.x",
+	"socket.io": "0.9.x",
+    "node-uuid": "1.3.3"
+  },
+  "main": "./lib/http-server",
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x"
+  }
+}
