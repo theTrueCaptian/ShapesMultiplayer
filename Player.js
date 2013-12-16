@@ -39,7 +39,7 @@ var Player = function(startX, startY, inshapeid, inname){
 		setX: setX,
 		setY: setY,
 		setShapeID: setShapeID,
-		setName = setName,
+		setName: setName,
 		id: id
 		}
 };
