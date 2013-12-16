@@ -1,17 +1,32 @@
+//Maeda HAnafi
+//client version of player class
+
 /**************************************************
 ** GAME PLAYER CLASS
 **************************************************/
-var Player = function(startX, startY) {
+var Player = function(startX, startY, inshapeid, inname) {
 	var x = startX,
 		y = startY,
-		moveAmount = 2,
-		id;
-	
+		name = inname,
+		moveAmount = 5,
+		id,
+		shape,//sprite object
+		shapeid=inshapeid;//the shape of the player, 0 = square, 1 = circle, 2 = triangle	
+		
 	var getX = function(){
 		return x;
 	};
 	var getY = function(){
 		return y;
+	};
+	var getShape = function(){
+		return shape;
+	};
+	var getShapeID = function(){
+		return shapeid;
+	};
+	var getName = function(){
+		return name;
 	};
 	var setX = function(newX){
 		x = newX;
@@ -19,38 +34,71 @@ var Player = function(startX, startY) {
 	var setY = function(newY){
 		y = newY;
 	};
+	var setShape = function(){
+		//the shape of the player, 0 = square, 1 = circle, 2 = triangle
+		console.log("Player shape "+shapeid);
+		if(shapeid==0){
+			shape = new Sprite(game, "js/images/rect.png", 50, 50);
+		}else if(shapeid==1){
+			shape = new Sprite(game, "js/images/circle.png", 50, 50);
+			
+		}else{
+			shape = new Sprite(game, "js/images/triangle.png", 50, 50);
+		}
+		shape.setSpeed(0);
+		
+	};
+	var setShapeID = function(newShapeID){
+		shapeid = newShapeID;
+	};
 	
-
-	var update = function(keys) {
+	var update = function() {
 		var prevX = x,
 			prevY = y;
-		// Up key takes priority over down
-		if (keys.up) {
-			y -= moveAmount;
-		} else if (keys.down) {
-			y += moveAmount;
-		};
-
-		// Left key takes priority over right
-		if (keys.left) {
+		
+		//check keys
+		if(keysDown[K_LEFT]){			
 			x -= moveAmount;
-		} else if (keys.right) {
+		}
+		if(keysDown[K_RIGHT]){
 			x += moveAmount;
-		};
+		}
+		if(keysDown[K_UP]){
+			y -= moveAmount;
+		}
+		if(keysDown[K_DOWN]){
+			y += moveAmount;
+		}
+		shape.setPosition(x,y);
+		
 		
 		//return true or false if the position is changed
 		return (prevX!=x || prevY!=y) ? true : false;
 	};
 
-	var draw = function(ctx) {
-		ctx.fillRect(x-5, y-5, 10, 10);
+	var draw = function() {
+		if(shape!=null){ //check if drawing something that is undefined
+			shape.setPosition(x, y);
+			//update the sprite
+			shape.update();
+		}else{//if it is undefined, then define it
+			setShape();
+		}
+			
+		//console.log("Player drawn "+x+" "+y);
 	};
 
+	
 	return {
 		getX: getX,
 		getY: getY,
+		getShape: getShape,
+		getShapeID: getShapeID,
+		getName:getName,
 		setX: setX,
 		setY: setY,
+		setShape: setShape,
+		setShapeID: setShapeID,
 		update: update,
 		draw: draw
 	}

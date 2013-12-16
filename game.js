@@ -1,5 +1,5 @@
 //Maeda Hanafi
-//Game server file
+//Game server file:coordinates multiplayer
 
 //some stuff for node.js
 var util = require("util");
@@ -94,18 +94,18 @@ function onClientDisconnect(){
 };
 function onNewPlayer(data){
 	//creates a new player
-	var newPlayer = new Player(data.x, data.y);
+	var newPlayer = new Player(data.x, data.y, data.shapeid, data.name);
 	newPlayer.id = this.id;
 	
 	//send info to the other players
-	this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY()});
+	this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), shapeid: newPlayer.getShapeID(), name: newPlayer.getName()});
 
 	//send existing players to the new player
 	var i, existingPlayer;
 	for(i=0; i<players.length; i++){
 		existingPlayer = players[i];
 		//send a message to the client we are dealing with
-		this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY()});
+		this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), shapeid: existingPlayer.getShapeID(), name: existingPlayer.getName()});
 
 	};
 	players.push(newPlayer);
@@ -121,7 +121,7 @@ function onMovePlayer(data){
 	movePlayer.setX(data.x);
 	movePlayer.setY(data.y);
 	
-	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY()});
+	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), shapeid: movePlayer.getShapeID()});
 };
 
 function playerById(id){

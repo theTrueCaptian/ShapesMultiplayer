@@ -1,11 +1,12 @@
+//Maeda Hanafi
 //client version of game.js
 
 /**************************************************
 ** GAME VARIABLES
 **************************************************/
-var canvas,			// Canvas DOM element
-	ctx,			// Canvas rendering context
-	keys,			// Keyboard input
+var width,
+	height,
+	game,			// game object (from simpleGame.js)
 	localPlayer,	// Local player
 	remotePlayers,  //the other players
 	socket;			//socket variable
@@ -15,32 +16,33 @@ var canvas,			// Canvas DOM element
 ** GAME INITIALISATION
 **************************************************/
 function init() {
-	// Declare the canvas and rendering context
-	canvas = document.getElementById("gameCanvas");
-	ctx = canvas.getContext("2d");
+	
+	//create the scene
+	game = new Scene();
 
 	// Maximise the canvas
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
-
-	// Initialise keyboard controls
-	keys = new Keys();
-
+	//width = window.innerWidth;
+	//height = window.innerHeight;
+	//game.setSize(width,height);
+	
 	// Calculate a random start position for the local player
 	// The minus 5 (half a player size) stops the player being
 	// placed right on the egde of the screen
-	var startX = Math.round(Math.random()*(canvas.width-5)),
-		startY = Math.round(Math.random()*(canvas.height-5));
+	var startX = Math.round(Math.random()*(game.width-5)),//startX = Math.round(Math.random()*(canvas.width-5)),
+		startY = Math.round(Math.random()*(game.height-5)),//startY = Math.round(Math.random()*(canvas.height-5)),
+		initshape = Math.round(Math.random()*(3));
 
 	// Initialise the local player
-	localPlayer = new Player(startX, startY);
-
-	//socket = io.connect("http://localhost", {port: 8000, transports: ["websocket"]});
+	localPlayer = new Player(startX, startY,initshape,"hey girl");
+	localPlayer.setShape();
+	
 	socket = io.connect();
+	
+	//game start
+	game.start();
 	
 	// Start listening for events
 	setEventHandlers();
-	
 	
 	remotePlayers = [];
 };
@@ -50,10 +52,7 @@ function init() {
 ** GAME EVENT HANDLERS
 **************************************************/
 var setEventHandlers = function() {
-	// Keyboard
-	window.addEventListener("keydown", onKeydown, false);
-	window.addEventListener("keyup", onKeyup, false);
-
+	
 	// Window resize
 	window.addEventListener("resize", onResize, false);
 	
@@ -64,31 +63,18 @@ var setEventHandlers = function() {
 	socket.on("remove player", onRemovePlayer);
 };
 
-// Keyboard key down
-function onKeydown(e) {
-	if (localPlayer) {
-		keys.onKeyDown(e);
-	};
-};
-
-// Keyboard key up
-function onKeyup(e) {
-	if (localPlayer) {
-		keys.onKeyUp(e);
-	};
-};
-
 // Browser window resize
 function onResize(e) {
-	// Maximise the canvas
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+	// set the canvas	
+	/*width = window.innerWidth;
+	height = window.innerHeight;
+	game.setSize(width,height);*/
 };
 
 function onSocketConnected() {
     console.log("Connected to socket server");
 	//tell server to create a new player on connecting
-	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY()});
+	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY(), shapeid: localPlayer.getShapeID(), name: localPlayer.getName()});
 };
 
 function onSocketDisconnect() {
@@ -98,7 +84,8 @@ function onSocketDisconnect() {
 function onNewPlayer(data) {
     console.log("New player connected: "+data.id);
 	//creating a new player based on the position data from the server
-	var newPlayer = new Player(data.x, data.y);
+	var newPlayer = new Player(data.x, data.y, data.shapeid, data.name);
+	newPlayer.setShape();
 	newPlayer.id = data.id;
 	remotePlayers.push(newPlayer);
 };
@@ -130,25 +117,23 @@ function onRemovePlayer(data) {
 
 
 /**************************************************
-** GAME ANIMATION LOOP
-**************************************************/
-function animate() {
-	update();
-	draw();
-
-	// Request a new animation frame using Paul Irish's shim
-	window.requestAnimFrame(animate);
-};
-
-
-/**************************************************
 ** GAME UPDATE
 **************************************************/
 function update() {
+	game.clear();
+	localPlayer.update();
 	//update the server on my position only on change
-	if(localPlayer.update(keys)){
-		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY()});
+	if(localPlayer.update()){
+		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY(), shapeid: localPlayer.getShapeID()});
 	};
+	
+	//draw all remote players to canvas
+	var i;
+	for(i=0; i<remotePlayers.length; i++){
+		remotePlayers[i].draw();
+	};
+	
+	draw();
 };
 
 
@@ -156,16 +141,15 @@ function update() {
 ** GAME DRAW
 **************************************************/
 function draw() {
-	// Wipe the canvas clean
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+	//game.clear();
+	
 	// Draw the local player
-	localPlayer.draw(ctx);
+	localPlayer.draw();
 	
 	//draw all remote players to canvas
 	var i;
 	for(i=0; i<remotePlayers.length; i++){
-		remotePlayers[i].draw(ctx);
+		remotePlayers[i].draw();
 	};
 };
 
