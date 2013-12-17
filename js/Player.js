@@ -4,12 +4,12 @@
 /**************************************************
 ** GAME PLAYER CLASS
 **************************************************/
-var Player = function(startX, startY, inshapeid, inname) {
+var Player = function(setid,startX, startY, inshapeid, inname) {
 	var x = startX,
 		y = startY,
 		name = inname,
 		moveAmount = 5,
-		id,
+		id=setid,
 		shape,//sprite object
 		shapeid=inshapeid;//the shape of the player, 0 = square, 1 = circle, 2 = triangle	
 		
@@ -27,6 +27,9 @@ var Player = function(startX, startY, inshapeid, inname) {
 	};
 	var getName = function(){
 		return name;
+	};
+	var getID = function(){
+		return id;
 	};
 	var setX = function(newX){
 		x = newX;
@@ -51,7 +54,9 @@ var Player = function(startX, startY, inshapeid, inname) {
 	var setShapeID = function(newShapeID){
 		shapeid = newShapeID;
 	};
-	
+	var setID = function(newID){
+		id = newID;
+	};
 	var update = function() {
 		var prevX = x,
 			prevY = y;
@@ -76,9 +81,11 @@ var Player = function(startX, startY, inshapeid, inname) {
 		return (prevX!=x || prevY!=y) ? true : false;
 	};
 
-	var draw = function() {
+	var draw = function(scene) {
 		if(shape!=null){ //check if drawing something that is undefined
+			
 			shape.setPosition(x, y);
+			scene.context.fillText(name+" "+id, x, y+shape.height);
 			//update the sprite
 			shape.update();
 		}else{//if it is undefined, then define it
@@ -95,10 +102,12 @@ var Player = function(startX, startY, inshapeid, inname) {
 		getShape: getShape,
 		getShapeID: getShapeID,
 		getName:getName,
+		setID:setID,
 		setX: setX,
 		setY: setY,
 		setShape: setShape,
 		setShapeID: setShapeID,
+		getID: getID,
 		update: update,
 		draw: draw
 	}

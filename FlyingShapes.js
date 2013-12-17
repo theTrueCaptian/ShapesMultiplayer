@@ -1,12 +1,11 @@
 //Maeda Hanafi
-//server version of player
+//server version of a flying shape object
 
-var Player = function(startX, startY, inshapeid, inname){
+var FlyingShapes = function(startid,startX, startY, inshapeid){
 	var x = startX,
 	y = startY,
 	shapeid = inshapeid, //the shape of the player, 0 = square, 1 = circle, 2 = triangle	
-	id,
-	name = inname;
+	id = startid;
 	
 	var getX = function(){
 		return x;
@@ -18,8 +17,8 @@ var Player = function(startX, startY, inshapeid, inname){
 	var getShapeID = function(){
 		return shapeid;
 	};
-	var getName = function(){
-		return name;
+	var getID = function(){
+		return id;
 	};
 	var setX = function(newX){
 		x = newX;
@@ -31,22 +30,19 @@ var Player = function(startX, startY, inshapeid, inname){
 	var setShapeID = function(newShapeID){
 		shapeid = newShapeID;
 	};
-	var setName = function(newName){
-		name=newName;
-	};
+	
 	return  {
 		getX: getX,
 		getY: getY,
 		getShapeID: getShapeID,
-		getName:getName,
+		getID:getID,
 		setX: setX,
 		setY: setY,
 		setShapeID: setShapeID,
-		setName: setName,
 		id: id
 		}
 };
 
-exports.Player = Player;
+exports.FlyingShapes = FlyingShapes;
 
 

@@ -5,23 +5,31 @@
 var util = require("util");
 	io = require("socket.io"),
 	Player = require("./Player").Player,
-	gameport        = process.env.PORT || 8000,
+	FlyingShapes = require("./FlyingShapes").FlyingShapes,
+	simpleGame = require("./js/simpleGame"),//(),
+	gameport        = process.env.PORT || 8000,	//use localhost:8000 if testing in local
 	express         = require('express'), //express framework 
-	http            = require('http'),
+	http            = require('http'),	//requires http (to send html over http when on cloud)
 	app             = express(),
     server          = http.createServer(app),
 	verbose         = false;
 	
 //core game variables
-var socket, players;
+var socket, players, 
+	flyingShapes	//all flying shapes
+	
+	;
 
+var MAX_NUM_SHAPES = 10, STANDARD_HEIGHT = 600, STANDARD_WIDTH=600;
 
 function init(){
 	//initializing the players variable to an empty array
 	players = [];
+	flyingShapes = [];	//same for this one
+	addFlyingShapes();
 	
 	//The express server handles passing our content to the browser,****************************8
-	 //Tell the server to listen for incoming connections
+	//Tell the server to listen for incoming connections
     server.listen(gameport)
 	
 	//app should send index.html to the user
@@ -33,13 +41,11 @@ function init(){
 	//This handler will listen for requests on /*, any file from the root of our server.
     app.get( '/*' , function( req, res, next ) {
 
-            //This is the current file they have requested
+        //This is the current file they have requested
         var file = req.params[0];
-
-            //For debugging, we can track what files are requested.
+        //For debugging, we can track what files are requested.
         if(verbose) console.log('\t :: Express :: file requested : ' + file);
-
-            //Send the requesting client the file.
+        //Send the requesting client the file.
         res.sendfile( __dirname + '/' + file );
 
     });
@@ -48,17 +54,17 @@ function init(){
 	socket = io.listen(server);
 	
 	socket.configure(function (){
-
         socket.set('log level', 2);
-
         socket.set('authorization', function (handshakeData, callback) {
           callback(null, true); // error first callback style
         });
 
     });
 	
+	
+	
 	//listen for related events
-	setEventHandlers();
+	setEventHandlers(); 
 };
 
 //listening to events
@@ -71,6 +77,8 @@ var setEventHandlers = function(){
 //function called when cnnnection recieved
 function onSocketConnection(client){
 	util.log("New player is connected: "+ client.id); //each player has a client.id, used for communicating with other players
+	
+	
 	//setting other of the event handlers
 	client.on("disconnect", onClientDisconnect);
 	client.on("new player", onNewPlayer);
@@ -96,7 +104,11 @@ function onNewPlayer(data){
 	//creates a new player
 	var newPlayer = new Player(data.x, data.y, data.shapeid, data.name);
 	newPlayer.id = this.id;
-	
+		
+	//send client his number	
+	util.log("sending id to client:"+this.id);
+	this.emit("id info", {id: this.id }); 
+
 	//send info to the other players
 	this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), shapeid: newPlayer.getShapeID(), name: newPlayer.getName()});
 
@@ -106,9 +118,13 @@ function onNewPlayer(data){
 		existingPlayer = players[i];
 		//send a message to the client we are dealing with
 		this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), shapeid: existingPlayer.getShapeID(), name: existingPlayer.getName()});
-
+		
 	};
 	players.push(newPlayer);
+	
+	//do the same for the flying shapes
+	sendFlyingShapes(this);
+	
 };
 function onMovePlayer(data){
 	var movePlayer = playerById(this.id);
@@ -133,6 +149,44 @@ function playerById(id){
 	return false;
 };
 
+function addFlyingShapes(){
+	
+	var num =Math.round(Math.random()*(10));
+	
+	for(i=0; i<num; i++){
+		var startX = Math.round(Math.random()*(STANDARD_WIDTH-5)),
+			startY = Math.round(Math.random()*(STANDARD_HEIGHT-5)),
+			initShape = Math.round(Math.random()*(3));
+		var newShape = new FlyingShapes(i,startX, startY, initShape);
+		flyingShapes.push(newShape);
+	};
+};
+
+function sendFlyingShapes(client){
+	for(i=0; i<flyingShapes.length; i++){
+		var curr = flyingShapes[i];
+		//send a message to the client we are dealing with
+		client.emit("add shape", {id: curr.getID(), x: curr.getX(), y: curr.getY(), shapeid: curr.getShapeID()});
+		
+	};
+};
+/*function loadScript(url, callback)
+{
+    // Adding the script tag to the head as suggested before
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url;
+
+    // Then bind the event to the callback function.
+    // There are several events for cross browser compatibility.
+    script.onreadystatechange = callback;
+    script.onload = callback;
+
+    // Fire the loading
+    head.appendChild(script);
+};
+*/
 //call the init func
 init();
 

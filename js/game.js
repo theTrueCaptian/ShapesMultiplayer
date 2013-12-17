@@ -9,6 +9,8 @@ var width,
 	game,			// game object (from simpleGame.js)
 	localPlayer,	// Local player
 	remotePlayers,  //the other players
+	flyingObjects,	//flying objects 
+	chatMode = false,	//chat mode (use enter to go into chat mode)
 	socket;			//socket variable
 
 
@@ -33,7 +35,7 @@ function init() {
 		initshape = Math.round(Math.random()*(3));
 
 	// Initialise the local player
-	localPlayer = new Player(startX, startY,initshape,"hey girl");
+	localPlayer = new Player(0,startX, startY,initshape,"");
 	localPlayer.setShape();
 	
 	socket = io.connect();
@@ -45,6 +47,7 @@ function init() {
 	setEventHandlers();
 	
 	remotePlayers = [];
+	flyingObject=[];
 };
 
 
@@ -55,12 +58,16 @@ var setEventHandlers = function() {
 	
 	// Window resize
 	window.addEventListener("resize", onResize, false);
-	
+	//setting event handlers, first param is the message to receive and 
+	//the second param is the function it will process on receiving the message
 	socket.on("connect", onSocketConnected);
 	socket.on("disconnect", onSocketDisconnect);
+	
 	socket.on("new player", onNewPlayer);
+	socket.on("id info", onReceiveID);
 	socket.on("move player", onMovePlayer);
 	socket.on("remove player", onRemovePlayer);
+	socket.on("add shape", onAddShape);
 };
 
 // Browser window resize
@@ -80,13 +87,19 @@ function onSocketConnected() {
 function onSocketDisconnect() {
     console.log("Disconnected from socket server");
 };
+function onReceiveID(data){
+	console.log("received my id:"+data.id);
+	//set this client's id
+	localPlayer.setID(data.id);
+	
+};
 
 function onNewPlayer(data) {
     console.log("New player connected: "+data.id);
 	//creating a new player based on the position data from the server
-	var newPlayer = new Player(data.x, data.y, data.shapeid, data.name);
+	var newPlayer = new Player(data.id,data.x, data.y, data.shapeid, data.name);
 	newPlayer.setShape();
-	newPlayer.id = data.id;
+	//newPlayer.id = data.id;
 	remotePlayers.push(newPlayer);
 };
 
@@ -115,6 +128,13 @@ function onRemovePlayer(data) {
 	
 };
 
+function onAddShape(data){
+	console.log("new shape: "+data.id);
+	//creating a new player based on the position data from the server
+	var newShape = new FlyingShapes(data.id, data.x, data.y, data.shapeid);
+	newShape.setShape();
+	flyingObject.push(newShape);
+};
 
 /**************************************************
 ** GAME UPDATE
@@ -124,14 +144,25 @@ function update() {
 	localPlayer.update();
 	//update the server on my position only on change
 	if(localPlayer.update()){
-		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY(), shapeid: localPlayer.getShapeID()});
+		socket.emit("move player", {id: localPlayer.getID(), x: localPlayer.getX(), y: localPlayer.getY(), shapeid: localPlayer.getShapeID()});
 	};
 	
 	//draw all remote players to canvas
 	var i;
 	for(i=0; i<remotePlayers.length; i++){
-		remotePlayers[i].draw();
+		remotePlayers[i].draw(game);
 	};
+	
+	//draw all flying shapes to canvas
+	var i;
+	for(i=0; i<flyingObject.length; i++){
+		flyingObject[i].draw(game);
+	};
+	
+	//check if chat mode is on
+	//if(!chatMode &&){
+	
+	//}
 	
 	draw();
 };
@@ -141,23 +172,23 @@ function update() {
 ** GAME DRAW
 **************************************************/
 function draw() {
-	//game.clear();
-	
 	// Draw the local player
-	localPlayer.draw();
+	localPlayer.draw(game);
 	
 	//draw all remote players to canvas
 	var i;
 	for(i=0; i<remotePlayers.length; i++){
-		remotePlayers[i].draw();
+		remotePlayers[i].draw(game);
 	};
 };
 
 function playerById(id){
 	var i;
 	for(i=0; i<remotePlayers.length; i++){
-		if(remotePlayers[i].id == id)
+		console.log("remote player checking: "+remotePlayers[i].getID());
+		if(remotePlayers[i].getID() == id){
 			return remotePlayers[i];
+		}
 	};
 	return false;
 };
