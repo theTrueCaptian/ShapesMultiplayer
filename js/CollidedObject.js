@@ -11,9 +11,9 @@ var CollidedObject = function(startX, startY, intext, incontex){
 	var draw = function() {
 		
 		//setting animation for the collided object
-		setTimeout(function(){
+		setInterval(function(){
 			context.font = '15pt Arial';
-			context.fillText(" "+inc, x, y);	
+			context.fillText(" "+text, x, y);	
 			y=y-10;
 			if(y==0){
 				//stop timer when it reaches the top
@@ -21,5 +21,7 @@ var CollidedObject = function(startX, startY, intext, incontex){
 		},50);
 			
 	};
-
-}:
+	return  {
+		draw:draw
+	}
+};
