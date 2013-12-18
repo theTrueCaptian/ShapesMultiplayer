@@ -6,7 +6,6 @@ var util = require("util");
 	io = require("socket.io"),
 	Player = require("./Player").Player,
 	FlyingShapes = require("./FlyingShapes").FlyingShapes,
-	simpleGame = require("./js/simpleGame")(),
 	gameport        = process.env.PORT || 8000,	//use localhost:8000 if testing in local
 	express         = require('express'), //express framework 
 	http            = require('http'),	//requires http (to send html over http when on cloud)
@@ -17,7 +16,6 @@ var util = require("util");
 //core game variables
 var socket, players, 
 	flyingShapes	//all flying shapes
-	
 	;
 
 var MAX_NUM_SHAPES = 10, STANDARD_HEIGHT = 600, STANDARD_WIDTH=600;
@@ -61,7 +59,11 @@ function init(){
 
     });
 	
-	
+	//set animation for shapes
+	setInterval(function() { 
+		util.log("animate!");
+		animate();
+	}, 500);
 	
 	//listen for related events
 	setEventHandlers(); 
@@ -77,8 +79,6 @@ var setEventHandlers = function(){
 //function called when cnnnection recieved
 function onSocketConnection(client){
 	util.log("New player is connected: "+ client.id); //each player has a client.id, used for communicating with other players
-	
-	
 	//setting other of the event handlers
 	client.on("disconnect", onClientDisconnect);
 	client.on("new player", onNewPlayer);
@@ -149,9 +149,9 @@ function playerById(id){
 	return false;
 };
 
-function addFlyingShapes(){
+function addFlyingShapes(){	//for adding shapes to the array
 	
-	var num =Math.round(Math.random()*(10));
+	var num =Math.round(Math.random()*(10))+5;
 	
 	for(i=0; i<num; i++){
 		var startX = Math.round(Math.random()*(STANDARD_WIDTH-5)),
@@ -170,23 +170,22 @@ function sendFlyingShapes(client){
 		
 	};
 };
-/*function loadScript(url, callback)
-{
-    // Adding the script tag to the head as suggested before
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = url;
-
-    // Then bind the event to the callback function.
-    // There are several events for cross browser compatibility.
-    script.onreadystatechange = callback;
-    script.onload = callback;
-
-    // Fire the loading
-    head.appendChild(script);
+function animate() {
+	update();
 };
-*/
+
+function update() {
+	
+	for(i=0; i<flyingShapes.length; i++){
+	
+		if(flyingShapes[i].update()){
+			util.log("Update flying shapes "+ flyingShapes[i].getX()+" "+flyingShapes[i].getY()); 
+			if(players.length>=1){	//send a message to all the folks out there if they exist
+				this.broadcast.emit("move shape", {id: flyingShapes[i].getID(), x: flyingShapes[i].getX(), y: flyingShapes[i].getY()});
+			}
+		}
+	};
+};
 //call the init func
 init();
 
