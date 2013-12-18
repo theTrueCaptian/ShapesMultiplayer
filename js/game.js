@@ -11,6 +11,8 @@ var width,
 	localPlayer,	// Local player
 	remotePlayers,  //the other players
 	flyingObjects,	//flying objects 
+	collidedObjects, //array of collided objects
+	soundArray,		//all the sounds used for collision
 	chatMode = false,	//chat mode (use enter to go into chat mode)
 	socket;			//socket variable
 
@@ -25,6 +27,9 @@ function init() {
 	//create the scene
 	game = new Scene();
 	game.setSize(STANDARD_WIDTH,STANDARD_HEIGHT);
+	
+	//load sound
+	loadSound();
 	
 	// Calculate a random start position for the local player
 	// The minus 5 (half a player size) stops the player being
@@ -47,6 +52,7 @@ function init() {
 	
 	remotePlayers = [];
 	flyingObject=[];
+	collidedObjects = [];
 };
 
 
@@ -225,6 +231,15 @@ function update() {
 	
 	draw();
 };
+function playSound(type){
+	var index = Math.round(Math.random()*(sound.length-1));
+	if(type=="kill"){
+		sound[3].play();
+	}else{
+		sound[index].play();
+	}
+
+};
 //Check if the player hits any flying shapes
 //If so, then change score, and tell server about it
 function checkCollision(){
@@ -233,9 +248,11 @@ function checkCollision(){
 		if(localPlayer.getShape().collidesWith(flyingObject[i].getShape())){
 			//give points to the player
 			if(flyingObject[i].getShapeID()==localPlayer.getShapeID()){	//check if the shapes are same, then give points
+				playSound("win");
 				localPlayer.setScore(localPlayer.getScore() + POINTS_INC);
 				drawpoint(POINTS_INC, flyingObject[i].getX(), flyingObject[i].getY(), flyingObject[i].getShapeID(), flyingObject[i].getShape().width, flyingObject[i].getShape().height);
 			}else{
+				playSound("kill");
 				localPlayer.setScore(localPlayer.getScore() + POINTS_DEC);	//else takes points off
 				drawpoint(POINTS_DEC, flyingObject[i].getX(), flyingObject[i].getY(), flyingObject[i].getShapeID(), flyingObject[i].getShape().width, flyingObject[i].getShape().height);
 			};
@@ -270,11 +287,11 @@ function drawpoint(inc, x, y, shapeid, w, h){
 	game.context.font = '15pt Arial';
 	game.context.fillText(" "+inc, x, y);	
 	//setting animation for the collided object
-	setTimeout(function(){
-		game.context.drawImage(img,x,y,w,h);
+	//setTimeout(function(){
+		//game.context.drawImage(img,x,y,w,h);
 		w--;
 		h--;
-	},50);
+	//},50);
 };
 
 //helper functions******************************************
@@ -295,4 +312,12 @@ function shapeById(id){
 		}
 	};
 	return false;
+};
+//loading resources*************************************************
+function loadSound(){
+	soundArray = [];
+	soundArray[0] = new Sound("js/sound/sound1.wav");
+	soundArray[1] = new Sound("js/sound/sound2.wav");
+	soundArray[2] = new Sound("js/sound/sound3.wav");
+	soundArray[3] = new Sound("js/sound/sound4.wav");
 };
