@@ -19,7 +19,7 @@ var socket, players,
 	flyingShapes,	//all flying shapes
 	countShapes=0;
 
-var MAX_NUM_SHAPES = 8,MIN_NUM_SHAPES = 0, STANDARD_HEIGHT = 600, STANDARD_WIDTH=750;
+var MAX_NUM_SHAPES = 10,MIN_NUM_SHAPES = 5, STANDARD_HEIGHT = 600, STANDARD_WIDTH=750;
 
 function init(){
 	//initializing the players variable to an empty array
@@ -147,7 +147,13 @@ function onMovePlayer(data){
 function sendFlyingShapesUpdate(data){
 	for(i=0; i<flyingShapes.length; i++){
 		//util.log("Update flying shapes "+ flyingShapes[i].getX()+" "+flyingShapes[i].getY()); 	
-		this.emit("move shape", {id: flyingShapes[i].getID(), x: flyingShapes[i].getX(), y: flyingShapes[i].getY()});
+		this.emit("move shape", {id: flyingShapes[i].getID(), x: flyingShapes[i].getX(), y: flyingShapes[i].getY(), shapeid: flyingShapes[i].getShapeID()});
+	};
+	//should we add more shapes?
+	if(flyingShapes.length<MIN_NUM_SHAPES){
+		//add more shapes
+		addFlyingShapes();
+		sendFlyingShapes(this);
 	};
 };
 
@@ -185,14 +191,14 @@ function sendFlyingShapes(client){
 function shapeById(id){
 	var i;
 	for(i=0; i<flyingShapes.length; i++){
-	util.log("check for id: "+flyingShapes[i].getID());
+	//util.log("check for id: "+flyingShapes[i].getID());
 		if(flyingShapes[i].getID() == id)
 			return flyingShapes[i];
 	};
 	return false;
 };
 function onCollision(data){
-	util.log("Collision: "+data.id+" " +data.shapeid);
+	//util.log("Collision: "+data.id+" " +data.shapeid);
 	
 	var removeShape = shapeById(data.shapeid);
 	//make sure that the shape to remove is found

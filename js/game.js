@@ -190,8 +190,8 @@ function update() {
 	var i;
 	for(i=0; i<flyingObject.length; i++){
 		if(localPlayer.getShape().collidesWith(flyingObject[i].getShape())){
-			
 			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID()});
+			console.log("collision! shape:"+flyingObject[i].getID()+" player:"+localPlayer.getID());
 			onRemoveShape({id:flyingObject[i].getID()});
 			break;
 		}

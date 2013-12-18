@@ -90,7 +90,7 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 		if(shape!=null){ //check if drawing something that is undefined
 			
 			shape.setPosition(x, y);
-			scene.context.fillText(name+" "+id, x, y+shape.height);
+			scene.context.fillText(name+" "+id, x-(shape.width), y+shape.height);
 			//update the sprite
 			shape.update();
 		}else{//if it is undefined, then define it
