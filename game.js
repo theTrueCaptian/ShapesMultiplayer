@@ -18,7 +18,7 @@ var socket, players,
 	flyingShapes,	//all flying shapes
 	conn;
 
-var MAX_NUM_SHAPES = 10, STANDARD_HEIGHT = 600, STANDARD_WIDTH=600;
+var MAX_NUM_SHAPES = 10, STANDARD_HEIGHT = 600, STANDARD_WIDTH=750;
 
 function init(){
 	//initializing the players variable to an empty array
@@ -83,6 +83,8 @@ function onSocketConnection(client){
 	client.on("disconnect", onClientDisconnect);
 	client.on("new player", onNewPlayer);
 	client.on("move player", onMovePlayer);
+	client.on("move shape", sendFlyingShapesUpdate);
+	client.on("collision", onCollision);
 	
 };
 
@@ -141,6 +143,13 @@ function onMovePlayer(data){
 	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), shapeid: movePlayer.getShapeID()});
 };
 
+function sendFlyingShapesUpdate(data){
+	for(i=0; i<flyingShapes.length; i++){
+		//util.log("Update flying shapes "+ flyingShapes[i].getX()+" "+flyingShapes[i].getY()); 	
+		this.emit("move shape", {id: flyingShapes[i].getID(), x: flyingShapes[i].getX(), y: flyingShapes[i].getY()});
+	};
+};
+
 function playerById(id){
 	var i;
 	for(i=0; i<players.length; i++){
@@ -168,25 +177,25 @@ function sendFlyingShapes(client){
 		var curr = flyingShapes[i];
 		//send a message to the client we are dealing with
 		client.emit("add shape", {id: curr.getID(), x: curr.getX(), y: curr.getY(), shapeid: curr.getShapeID()});
-		
 	};
+};
+
+function onCollision(data){
+util.log("Collision: "+data.id+" " +data.shapeid);
+
 };
 //animation updates the flying shapes 
 function animate() {
 	update();
+	
 };
 
 function update() {
-	
 	for(i=0; i<flyingShapes.length; i++){	
-		if(flyingShapes[i].update()){
-			util.log("Update flying shapes "+ flyingShapes[i].getX()+" "+flyingShapes[i].getY()); 
-			if(players.length>=1){	//send a message to all the folks out there if they exist
-				conn.broadcast.emit("move shape", {id: flyingShapes[i].getID(), x: flyingShapes[i].getX(), y: flyingShapes[i].getY()});
-			}
-		}
+		flyingShapes[i].update(STANDARD_WIDTH, STANDARD_HEIGHT);
 	};
 };
+
 //call the init func
 init();
 

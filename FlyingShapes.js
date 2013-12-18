@@ -5,7 +5,10 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 	var x = startX,
 	y = startY,
 	shapeid = inshapeid, //the shape of the player, 0 = square, 1 = circle, 2 = triangle	
-	id = startid;	
+	id = startid,
+	moveAmount = Math.round(Math.random()*(15))+10,
+	signx,
+	signy;	
 	
 	var getX = function(){
 		return x;
@@ -30,17 +33,32 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 	var setShapeID = function(newShapeID){
 		shapeid = newShapeID;
 	};
-	var update = function() {
+	var update = function(width, height) {
 		var prevX=x, prevY=y;
-		
-		var dx = (Math.random()),
-			dy = (Math.random());
+		if(signx ==null || signy==null){
+			signx=generateRandomSign();
+			signy=generateRandomSign();
+		}
+		var dx = (moveAmount)*signx,
+			dy = moveAmount*signy;
 		x += dx;
 		y += dy;
 		
+		if(x>width)	x=0;
+		if(y>height) y=0;
 		
 		//return true or false if the position is changed
 		return (prevX!=x || prevY!=y) ? true : false;
+	};
+	
+	var generateRandomSign = function(){
+		var rand = Math.round(Math.random()*(10));
+		
+		if(rand%2==0){
+			return 1;
+		}else{
+			return -1;
+		}
 	};
 	return  {
 		getX: getX,

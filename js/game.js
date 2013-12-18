@@ -13,6 +13,7 @@ var width,
 	chatMode = false,	//chat mode (use enter to go into chat mode)
 	socket;			//socket variable
 
+var STANDARD_HEIGHT = 600, STANDARD_WIDTH=750;
 
 /**************************************************
 ** GAME INITIALISATION
@@ -25,7 +26,7 @@ function init() {
 	// Maximise the canvas
 	//width = window.innerWidth;
 	//height = window.innerHeight;
-	//game.setSize(width,height);
+	game.setSize(STANDARD_WIDTH,STANDARD_HEIGHT);
 	
 	// Calculate a random start position for the local player
 	// The minus 5 (half a player size) stops the player being
@@ -138,15 +139,29 @@ function onAddShape(data){
 };
 
 function onMoveShape(data){
-	console.log("move shape: "+data.id);
+	//console.log("move shape: "+data.id);
 	//search for the shape that is being moved and update it
-	var moveShape = shapeById(id);
+	var moveShape = shapeById(data.id);
 	if(!moveShape){
 		console.log("Shape not found: "+data.id);
 		return;
 	};
 	moveShape.setX(data.x);
 	moveShape.setY(data.y);
+};
+
+function onRemoveShape(data) {
+	//search for the shape that is being moved and update it
+	var moveShape = shapeById(data.id);
+	console.log("I am told to remove this shape: "+data.id);
+	//make sure that the moveShape is found
+	if(!moveShape){
+		console.log("shape not found: "+data.id);
+		return;
+	};
+	//removing player from array
+	flyingObject.splice(flyingObject.indexOf(moveShape), 1);
+	
 };
 
 /**************************************************
@@ -170,6 +185,17 @@ function update() {
 	var i;
 	for(i=0; i<flyingObject.length; i++){
 		flyingObject[i].draw(game);
+	};
+	
+	//alert server to send updates shapes coordinates
+	socket.emit("move shape", {id: localPlayer.getID()});
+	
+	//check for collisions
+	var i;
+	for(i=0; i<flyingObject.length; i++){
+		if(localPlayer.getShape().collidesWith(flyingObject[i].getShape())){
+			socket.emit("collision", {id: localPlayer.getID(), shapeid: flyingObject[i].id});
+		}
 	};
 	
 	//check if chat mode is on
@@ -209,7 +235,7 @@ function playerById(id){
 function shapeById(id){
 	var i;
 	for(i=0; i<flyingObject.length; i++){
-		if(flyingObject[i].getID() == id){
+		if(flyingObject[i].id == id){
 			return flyingObject[i];
 		}
 	};
