@@ -87,7 +87,7 @@ function onSocketConnection(client){
 	client.on("move player", onMovePlayer);
 	client.on("move shape", sendFlyingShapesUpdate);
 	client.on("remove shape", onCollision);
-	socket.on("score update", onUpdateScoreBoard);
+	client.on("score update", onUpdateScoreBoard);
 };
 
 //functions that handle other events******************************

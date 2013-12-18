@@ -130,7 +130,6 @@ function onMovePlayer(data) {
 //and the player is removed.
 function onRemovePlayer(data) {
 	var removePlayer = playerById(data.id);
-	console.log("I am told to remove this player: "+data.id);
 	//make sure that the player is found
 	if(!removePlayer){
 		console.log("PLayer not found: "+data.id);
@@ -156,7 +155,6 @@ function onUpdateScoreBoard(data){
 
 //This function responds to "new shape" message, and creates a shape in the flying shape array
 function onAddShape(data){
-	console.log("new shape: "+data.id);
 	//creating a new shape based on the position data from the server
 	if(!shapeById(data.id)){	//make sure doesn't already know about the existence of this particular shape
 		var newShape = new FlyingShapes(data.id, data.x, data.y, data.shapeid);
@@ -180,7 +178,6 @@ function onMoveShape(data){
 function onRemoveShape(data) {
 	//search for the shape that is being remove and remove it
 	var removeShape = shapeById(data.id);
-	console.log("I am told to remove this shape: "+data.id);
 	//make sure that the removeShape is found
 	if(!removeShape){
 		console.log("shape not found: "+data.id);
@@ -243,7 +240,7 @@ function checkCollision(){
 			};
 			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID()});
 			socket.emit("score update", {id: localPlayer.getID(), newscore: localPlayer.getScore()});
-			console.log("collision! shape:"+flyingObject[i].getID()+" player:"+localPlayer.getID());
+			console.log("Player with new score "+localPlayer.getID()+" " + localPlayer.getScore());
 			
 			
 			onRemoveShape({id:flyingObject[i].getID()});
