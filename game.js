@@ -15,8 +15,8 @@ var util = require("util");
 	
 //core game variables
 var socket, players, 
-	flyingShapes	//all flying shapes
-	;
+	flyingShapes,	//all flying shapes
+	conn;
 
 var MAX_NUM_SHAPES = 10, STANDARD_HEIGHT = 600, STANDARD_WIDTH=600;
 
@@ -83,6 +83,7 @@ function onSocketConnection(client){
 	client.on("disconnect", onClientDisconnect);
 	client.on("new player", onNewPlayer);
 	client.on("move player", onMovePlayer);
+	
 };
 
 //functions that handle other events*********************
@@ -104,7 +105,7 @@ function onNewPlayer(data){
 	//creates a new player
 	var newPlayer = new Player(data.x, data.y, data.shapeid, data.name);
 	newPlayer.id = this.id;
-		
+		conn=this;
 	//send client his number	
 	util.log("sending id to client:"+this.id);
 	this.emit("id info", {id: this.id }); 
@@ -177,12 +178,11 @@ function animate() {
 
 function update() {
 	
-	for(i=0; i<flyingShapes.length; i++){
-	
+	for(i=0; i<flyingShapes.length; i++){	
 		if(flyingShapes[i].update()){
-			//util.log("Update flying shapes "+ flyingShapes[i].getX()+" "+flyingShapes[i].getY()); 
+			util.log("Update flying shapes "+ flyingShapes[i].getX()+" "+flyingShapes[i].getY()); 
 			if(players.length>=1){	//send a message to all the folks out there if they exist
-				this.broadcast.emit("move shape", {id: flyingShapes[i].getID(), x: flyingShapes[i].getX(), y: flyingShapes[i].getY()});
+				conn.broadcast.emit("move shape", {id: flyingShapes[i].getID(), x: flyingShapes[i].getX(), y: flyingShapes[i].getY()});
 			}
 		}
 	};

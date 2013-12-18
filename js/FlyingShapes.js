@@ -66,7 +66,6 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 		draw:draw
 		}
 };
-//allow other files to access this
-exports.FlyingShapes = FlyingShapes;
+
 
 
