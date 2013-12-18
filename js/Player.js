@@ -57,7 +57,7 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 	var setID = function(newID){
 		id = newID;
 	};
-	var update = function() {
+	var update = function(width, height) {
 		var prevX = x,
 			prevY = y;
 		
@@ -74,6 +74,10 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 		if(keysDown[K_DOWN]){
 			y += moveAmount;
 		}
+		
+		if(x>width)	x=0;
+		if(y>height) y=0;
+		
 		shape.setPosition(x,y);
 		
 		

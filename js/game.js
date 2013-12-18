@@ -22,10 +22,6 @@ function init() {
 	
 	//create the scene
 	game = new Scene();
-
-	// Maximise the canvas
-	//width = window.innerWidth;
-	//height = window.innerHeight;
 	game.setSize(STANDARD_WIDTH,STANDARD_HEIGHT);
 	
 	// Calculate a random start position for the local player
@@ -101,7 +97,6 @@ function onNewPlayer(data) {
 	//creating a new player based on the position data from the server
 	var newPlayer = new Player(data.id,data.x, data.y, data.shapeid, data.name);
 	newPlayer.setShape();
-	//newPlayer.id = data.id;
 	remotePlayers.push(newPlayer);
 };
 
@@ -169,7 +164,7 @@ function onRemoveShape(data) {
 **************************************************/
 function update() {
 	game.clear();
-	localPlayer.update();
+	localPlayer.update(STANDARD_WIDTH, STANDARD_HEIGHT);
 	//update the server on my position only on change
 	if(localPlayer.update()){
 		socket.emit("move player", {id: localPlayer.getID(), x: localPlayer.getX(), y: localPlayer.getY(), shapeid: localPlayer.getShapeID()});
