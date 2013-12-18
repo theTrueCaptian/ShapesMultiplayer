@@ -35,9 +35,9 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 	var setShapeID = function(newShapeID){
 		shapeid = newShapeID;
 	};
+	//This function must be called in order for anything to be displayed
 	var setShape = function(){
 		//the shape of the player, 0 = square, 1 = circle, 2 = triangle
-		console.log("new shape "+shapeid);
 		if(shapeid==0){
 			shape = new Sprite(game, "js/images/rect.png", 50, 50);
 		}else if(shapeid==1){
@@ -46,13 +46,14 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 		}else{
 			shape = new Sprite(game, "js/images/triangle.png", 50, 50);
 		}
-		//shape.setSpeed(0);
 		
 	};
+	//Draws the sprite to the scene
 	var draw = function(scene) {
 		if(shape!=null){ //check if drawing something that is undefined
 			
 			shape.setPosition(x, y);
+			scene.context.fillText(" "+id, x, y+shape.height);
 			//update the sprite
 			shape.update();
 		}else{//if it is undefined, then define it

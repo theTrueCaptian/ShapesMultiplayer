@@ -1,5 +1,6 @@
 //Maeda Hanafi
 //client version of game.js
+//This is part  the index.html
 
 /**************************************************
 ** GAME VARIABLES
@@ -27,8 +28,8 @@ function init() {
 	// Calculate a random start position for the local player
 	// The minus 5 (half a player size) stops the player being
 	// placed right on the egde of the screen
-	var startX = Math.round(Math.random()*(game.width-5)),//startX = Math.round(Math.random()*(canvas.width-5)),
-		startY = Math.round(Math.random()*(game.height-5)),//startY = Math.round(Math.random()*(canvas.height-5)),
+	var startX = Math.round(Math.random()*(game.width-5)),
+		startY = Math.round(Math.random()*(game.height-5)),
 		initshape = Math.round(Math.random()*(3));
 
 	// Initialise the local player
@@ -77,15 +78,20 @@ function onResize(e) {
 	game.setSize(width,height);*/
 };
 
+//When the first connects, it sends a message to the server about its location and name and shape
 function onSocketConnected() {
     console.log("Connected to socket server");
 	//tell server to create a new player on connecting
 	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY(), shapeid: localPlayer.getShapeID(), name: localPlayer.getName()});
 };
 
+//This function is called when the client disconnects from the server
 function onSocketDisconnect() {
     console.log("Disconnected from socket server");
 };
+
+//This function will be called when "id info" message is sent
+//The player's id will be set
 function onReceiveID(data){
 	console.log("received my id:"+data.id);
 	//set this client's id
@@ -93,6 +99,8 @@ function onReceiveID(data){
 	
 };
 
+//When a new player connects to the server, the client will receive a "new player" message 
+//and a new player is added to the remotePlayers array
 function onNewPlayer(data) {
     console.log("New player connected: "+data.id);
 	//creating a new player based on the position data from the server
@@ -101,6 +109,8 @@ function onNewPlayer(data) {
 	remotePlayers.push(newPlayer);
 };
 
+//When a remote player moves, "move player" is sent and this function is called
+//Updates the remotePlayer array 
 function onMovePlayer(data) {
 	//search for the player that is being moved and update it
 	var movePlayer = playerById(data.id);
@@ -113,6 +123,8 @@ function onMovePlayer(data) {
 
 };
 
+//When a player is removed, "remove player" is sent and this function is called,
+//and the player is removed.
 function onRemovePlayer(data) {
 	var removePlayer = playerById(data.id);
 	console.log("I am told to remove this player: "+data.id);
@@ -126,6 +138,7 @@ function onRemovePlayer(data) {
 	
 };
 
+//This function responds to "new shape" message, and creates a shape in the flying shape array
 function onAddShape(data){
 	console.log("new shape: "+data.id);
 	//creating a new shape based on the position data from the server
@@ -136,18 +149,18 @@ function onAddShape(data){
 	};
 };
 
+//This function responds to the "move shape" message, and move the particular shape
 function onMoveShape(data){
-	//console.log("move shape: "+data.id);
 	//search for the shape that is being moved and update it
 	var moveShape = shapeById(data.id);
 	if(!moveShape){
-		//console.log("Shape not found: "+data.id);
 		return;
 	};
 	moveShape.setX(data.x);
 	moveShape.setY(data.y);
 };
 
+//This function responds to "remove shape" message from server and removes the particular shape
 function onRemoveShape(data) {
 	//search for the shape that is being remove and remove it
 	var removeShape = shapeById(data.id);
@@ -164,6 +177,7 @@ function onRemoveShape(data) {
 
 /**************************************************
 ** GAME UPDATE
+** This is constantly called to update the canvas and coordinate communication
 **************************************************/
 function update() {
 	game.clear();

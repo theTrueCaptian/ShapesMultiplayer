@@ -1,8 +1,8 @@
 Maeda Hanafi
-CSC536 Final Project: Multiplayer In Node.js
+CSC536 Final Project: Multiplayer Game In Node.js
 =============================
 
-View the live here :
+View the live here:
 http://csc563maeda.herokuapp.com
 
 

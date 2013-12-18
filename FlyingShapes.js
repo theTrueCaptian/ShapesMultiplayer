@@ -5,9 +5,9 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 	var x = startX,
 	y = startY,
 	shapeid = inshapeid, //the shape of the player, 0 = square, 1 = circle, 2 = triangle	
-	id = startid,
-	moveAmount = Math.round(Math.random()*(15))+10,
-	signx,
+	id = startid,	//unique id of a shape
+	moveAmount = Math.round(Math.random()*(5))+5,
+	signx, //directional information
 	signy;	
 	
 	var getX = function(){

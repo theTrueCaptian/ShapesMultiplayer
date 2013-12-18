@@ -17,10 +17,11 @@ var util = require("util");
 //core game variables
 var socket, players, 
 	flyingShapes,	//all flying shapes
-	countShapes=0;
+	countShapes=0;	//this is used to count total of shapes (including non active ones), and used for shapes unique id
 
 var MAX_NUM_SHAPES = 10,MIN_NUM_SHAPES = 5, STANDARD_HEIGHT = 600, STANDARD_WIDTH=750;
 
+//Initializing server/game
 function init(){
 	//initializing the players variable to an empty array
 	players = [];
@@ -89,7 +90,10 @@ function onSocketConnection(client){
 	
 };
 
-//functions that handle other events*********************
+//functions that handle other events******************************
+
+//When client disconnects, the server removes that player from the array and tell everyone else about its removal
+//This function is called, when a client closes
 function onClientDisconnect(){
 	util.log("player has disconnected: "+this.id); //this refers to the client variable from the onSocketConnection func
 	var removePlayer = playerById(this.id);
@@ -104,6 +108,11 @@ function onClientDisconnect(){
 	util.log("sending message to the rest of players of a removed player:"+this.id);
 	this.broadcast.emit("remove player", {id: this.id});
 };
+
+//This function is called when the client first connects.
+//it creates a new player in the players array and broadcasts its existence to the rest of the players
+//Also sends the flying objects array to the new player
+//The server also sends the client his unique id number
 function onNewPlayer(data){
 	//creates a new player
 	var newPlayer = new Player(data.x, data.y, data.shapeid, data.name);
@@ -130,6 +139,9 @@ function onNewPlayer(data){
 	sendFlyingShapes(this);
 	
 };
+
+//This function is called when a client sends "move player" message
+//The server sends the updated coordinates to the rest of the player
 function onMovePlayer(data){
 	var movePlayer = playerById(this.id);
 	
@@ -144,9 +156,11 @@ function onMovePlayer(data){
 	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), shapeid: movePlayer.getShapeID()});
 };
 
+//A client will constantly alert the server to send the updated coordinates of the flying shapes
+//This function will respond to the "move shapes" by sending updates to clients on the flying objects
+//This function also decides if new shapes will be created
 function sendFlyingShapesUpdate(data){
 	for(i=0; i<flyingShapes.length; i++){
-		//util.log("Update flying shapes "+ flyingShapes[i].getX()+" "+flyingShapes[i].getY()); 	
 		this.emit("move shape", {id: flyingShapes[i].getID(), x: flyingShapes[i].getX(), y: flyingShapes[i].getY(), shapeid: flyingShapes[i].getShapeID()});
 	};
 	//should we add more shapes?
@@ -157,6 +171,7 @@ function sendFlyingShapesUpdate(data){
 	};
 };
 
+//A helper function to find player by its unique id
 function playerById(id){
 	var i;
 	for(i=0; i<players.length; i++){
@@ -166,8 +181,8 @@ function playerById(id){
 	return false;
 };
 
+//This function creates flying shapes to the array, flyingShapes
 function addFlyingShapes(){	//for adding shapes to the array
-	
 	var num =Math.round(Math.random()*(MAX_NUM_SHAPES))+MIN_NUM_SHAPES;
 	
 	for(i=0; i<num; i++){
@@ -181,29 +196,35 @@ function addFlyingShapes(){	//for adding shapes to the array
 	};
 };
 
+//Thus function is called by other functions in this server file to send the updates to all the clients 
+//This is normally called when a new player is created or when a client asks for an update on the coordinates
 function sendFlyingShapes(client){
 	for(i=0; i<flyingShapes.length; i++){
 		var curr = flyingShapes[i];
-		//send all flying shapes to all clients
+		//send all flying shapes to all clients (broadcast)
 		client.broadcast.emit("add shape", {id: curr.getID(), x: curr.getX(), y: curr.getY(), shapeid: curr.getShapeID()});
+		//send an update to a particular client, if called by one
+		client.emit("add shape", {id: curr.getID(), x: curr.getX(), y: curr.getY(), shapeid: curr.getShapeID()});
 	};
 };
+
+//A helper function to find a shape by its unique id
 function shapeById(id){
 	var i;
 	for(i=0; i<flyingShapes.length; i++){
-	//util.log("check for id: "+flyingShapes[i].getID());
 		if(flyingShapes[i].getID() == id)
 			return flyingShapes[i];
 	};
 	return false;
 };
+
+//When a client alerts of a collision with "remove shape", this function is called
+//A broadcast is sent to alert a removed shape
+//Then the shape is removed from the array
 function onCollision(data){
-	//util.log("Collision: "+data.id+" " +data.shapeid);
-	
 	var removeShape = shapeById(data.shapeid);
 	//make sure that the shape to remove is found
 	if(!removeShape){
-		//util.log("shape not found: "+data.shapeid);
 		return;
 	};
 	//removing the shape from array
@@ -211,12 +232,14 @@ function onCollision(data){
 	this.broadcast.emit("remove shape", {id: data.shapeid});
 };
 
-//animation updates the flying shapes ******************
+//animation updates the flying shapes *******************************
+//This function is constantly called to animate the flying objects
 function animate() {
 	update();
 	
 };
 
+//Updating the flying shapes coordinates
 function update() {
 	for(i=0; i<flyingShapes.length; i++){	
 		flyingShapes[i].update(STANDARD_WIDTH, STANDARD_HEIGHT);
