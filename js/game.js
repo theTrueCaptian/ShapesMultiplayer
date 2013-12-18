@@ -232,11 +232,11 @@ function update() {
 	draw();
 };
 function playSound(type){
-	var index = Math.round(Math.random()*(sound.length-1));
+	var index = Math.round(Math.random()*(soundArray.length-1));
 	if(type=="kill"){
-		sound[3].play();
+		soundArray[3].play();
 	}else{
-		sound[index].play();
+		soundArray[index].play();
 	}
 
 };
@@ -316,8 +316,8 @@ function shapeById(id){
 //loading resources*************************************************
 function loadSound(){
 	soundArray = [];
-	soundArray[0] = new Sound("js/sound/sound1.wav");
-	soundArray[1] = new Sound("js/sound/sound2.wav");
-	soundArray[2] = new Sound("js/sound/sound3.wav");
-	soundArray[3] = new Sound("js/sound/sound4.wav");
+	soundArray[0] = new Sound("js/sound/sound1.ogg");
+	soundArray[1] = new Sound("js/sound/sound2.ogg");
+	soundArray[2] = new Sound("js/sound/sound3.ogg");
+	soundArray[3] = new Sound("js/sound/sound4.ogg");
 };
