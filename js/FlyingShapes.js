@@ -47,14 +47,12 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 		if(shape!=null){ //check if drawing something that is undefined
 			
 			shape.setPosition(x, y);
-			//scene.context.fillText(name+" "+id, x, y+shape.height);
 			//update the sprite
 			shape.update();
 		}else{//if it is undefined, then define it
 			setShape();
 		}
 			
-		//console.log("Player drawn "+x+" "+y);
 	};
 	return  {
 		getX: getX,
@@ -68,7 +66,7 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 		draw:draw
 		}
 };
-
+//allow other files to access this
 exports.FlyingShapes = FlyingShapes;
 
 

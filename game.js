@@ -61,7 +61,7 @@ function init(){
 	
 	//set animation for shapes
 	setInterval(function() { 
-		util.log("animate!");
+		//util.log("animate!");
 		animate();
 	}, 500);
 	
@@ -170,6 +170,7 @@ function sendFlyingShapes(client){
 		
 	};
 };
+//animation updates the flying shapes 
 function animate() {
 	update();
 };
@@ -179,7 +180,7 @@ function update() {
 	for(i=0; i<flyingShapes.length; i++){
 	
 		if(flyingShapes[i].update()){
-			util.log("Update flying shapes "+ flyingShapes[i].getX()+" "+flyingShapes[i].getY()); 
+			//util.log("Update flying shapes "+ flyingShapes[i].getX()+" "+flyingShapes[i].getY()); 
 			if(players.length>=1){	//send a message to all the folks out there if they exist
 				this.broadcast.emit("move shape", {id: flyingShapes[i].getID(), x: flyingShapes[i].getX(), y: flyingShapes[i].getY()});
 			}

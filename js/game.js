@@ -68,6 +68,7 @@ var setEventHandlers = function() {
 	socket.on("move player", onMovePlayer);
 	socket.on("remove player", onRemovePlayer);
 	socket.on("add shape", onAddShape);
+	socket.on("move shape", onMoveShape);
 };
 
 // Browser window resize
@@ -130,10 +131,22 @@ function onRemovePlayer(data) {
 
 function onAddShape(data){
 	console.log("new shape: "+data.id);
-	//creating a new player based on the position data from the server
+	//creating a new shape based on the position data from the server
 	var newShape = new FlyingShapes(data.id, data.x, data.y, data.shapeid);
 	newShape.setShape();
 	flyingObject.push(newShape);
+};
+
+function onMoveShape(data){
+	console.log("move shape: "+data.id);
+	//search for the shape that is being moved and update it
+	var moveShape = shapeById(id);
+	if(!moveShape){
+		console.log("Shape not found: "+data.id);
+		return;
+	};
+	moveShape.setX(data.x);
+	moveShape.setY(data.y);
 };
 
 /**************************************************
@@ -182,12 +195,22 @@ function draw() {
 	};
 };
 
+//helper functions******************************************
 function playerById(id){
 	var i;
 	for(i=0; i<remotePlayers.length; i++){
 		console.log("remote player checking: "+remotePlayers[i].getID());
 		if(remotePlayers[i].getID() == id){
 			return remotePlayers[i];
+		}
+	};
+	return false;
+};
+function shapeById(id){
+	var i;
+	for(i=0; i<flyingObject.length; i++){
+		if(flyingObject[i].getID() == id){
+			return flyingObject[i];
 		}
 	};
 	return false;

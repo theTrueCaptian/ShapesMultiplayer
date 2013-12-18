@@ -54,7 +54,7 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 		update: update
 		}
 };
-
+//allow main game.js file to access this file
 exports.FlyingShapes = FlyingShapes;
 
 

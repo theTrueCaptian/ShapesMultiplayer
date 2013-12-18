@@ -46,7 +46,7 @@ var Player = function(startX, startY, inshapeid, inname){
 		id: id
 		}
 };
-
+//allow access for other files to access this
 exports.Player = Player;
 
 
