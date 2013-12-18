@@ -234,14 +234,13 @@ function checkCollision(){
 			//give points to the player
 			if(flyingObject[i].getShapeID()==localPlayer.getShapeID()){	//check if the shapes are same, then give points
 				localPlayer.setScore(localPlayer.getScore() + POINTS_INC);
-				drawpoint(POINTS_INC, flyingObject[i].getX(), flyingObject[i].getY());
+				drawpoint(POINTS_INC, flyingObject[i].getX(), flyingObject[i].getY(), flyingObject[i].getShapeID(), flyingObject[i].getShape().width, flyingObject[i].getShape().height);
 			}else{
 				localPlayer.setScore(localPlayer.getScore() + POINTS_DEC);	//else takes points off
-				drawpoint(POINTS_DEC, flyingObject[i].getX(), flyingObject[i].getY());
+				drawpoint(POINTS_DEC, flyingObject[i].getX(), flyingObject[i].getY(), flyingObject[i].getShapeID(), flyingObject[i].getShape().width, flyingObject[i].getShape().height);
 			};
 			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID()});
 			socket.emit("score update", {id: localPlayer.getID(), newscore: localPlayer.getScore()});
-			//console.log("Player with new score "+localPlayer.getID()+" " + localPlayer.getScore());
 			
 			onRemoveShape({id:flyingObject[i].getID()});
 			break;
@@ -267,9 +266,15 @@ function draw() {
 };
 
 //Draws the points that the player earned or lost during collision
-function drawpoint(inc, x, y){
-	game.context.font = ' 15pt Arial';
-	game.context.fillText(" "+inc, x, y);		
+function drawpoint(inc, x, y, shapeid, w, h){
+	game.context.font = '15pt Arial';
+	game.context.fillText(" "+inc, x, y);	
+	//setting animation for the collided object
+	setTimeout(function(){
+		game.context.drawImage(img,x,y,w,h);
+		w--;
+		h--;
+	},50);
 };
 
 //helper functions******************************************
