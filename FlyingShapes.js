@@ -44,8 +44,10 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 		x += dx;
 		y += dy;
 		
-		if(x>width)	x=0;
-		if(y>height) y=0;
+		if(x>width+10)	x=0;
+		if(y>height+10) y=0;
+		if(x<-10) x= width;
+		if(y<-10)	y=height;
 		
 		//return true or false if the position is changed
 		return (prevX!=x || prevY!=y) ? true : false;

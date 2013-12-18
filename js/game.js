@@ -66,6 +66,7 @@ var setEventHandlers = function() {
 	socket.on("remove player", onRemovePlayer);
 	socket.on("add shape", onAddShape);
 	socket.on("move shape", onMoveShape);
+	socket.on("remove shape", onRemoveShape);
 };
 
 // Browser window resize
@@ -138,7 +139,7 @@ function onMoveShape(data){
 	//search for the shape that is being moved and update it
 	var moveShape = shapeById(data.id);
 	if(!moveShape){
-		console.log("Shape not found: "+data.id);
+		//console.log("Shape not found: "+data.id);
 		return;
 	};
 	moveShape.setX(data.x);
@@ -146,16 +147,16 @@ function onMoveShape(data){
 };
 
 function onRemoveShape(data) {
-	//search for the shape that is being moved and update it
-	var moveShape = shapeById(data.id);
+	//search for the shape that is being remove and remove it
+	var removeShape = shapeById(data.id);
 	console.log("I am told to remove this shape: "+data.id);
-	//make sure that the moveShape is found
-	if(!moveShape){
+	//make sure that the removeShape is found
+	if(!removeShape){
 		console.log("shape not found: "+data.id);
 		return;
 	};
 	//removing player from array
-	flyingObject.splice(flyingObject.indexOf(moveShape), 1);
+	flyingObject.splice(flyingObject.indexOf(removeShape), 1);
 	
 };
 
@@ -189,7 +190,8 @@ function update() {
 	var i;
 	for(i=0; i<flyingObject.length; i++){
 		if(localPlayer.getShape().collidesWith(flyingObject[i].getShape())){
-			socket.emit("collision", {id: localPlayer.getID(), shapeid: flyingObject[i].id});
+			onRemoveShape({id:flyingObject[i].getID()});
+			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID()});
 		}
 	};
 	
@@ -220,7 +222,7 @@ function draw() {
 function playerById(id){
 	var i;
 	for(i=0; i<remotePlayers.length; i++){
-		console.log("remote player checking: "+remotePlayers[i].getID());
+		//console.log("remote player checking: "+remotePlayers[i].getID());
 		if(remotePlayers[i].getID() == id){
 			return remotePlayers[i];
 		}
@@ -230,7 +232,7 @@ function playerById(id){
 function shapeById(id){
 	var i;
 	for(i=0; i<flyingObject.length; i++){
-		if(flyingObject[i].id == id){
+		if(flyingObject[i].getID() == id){
 			return flyingObject[i];
 		}
 	};

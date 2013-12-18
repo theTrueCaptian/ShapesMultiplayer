@@ -1,5 +1,6 @@
 //Maeda Hanafi
 //Game server file:coordinates multiplayer
+//This file will run on the cloud, and respond to clients to coordinate multiplayer
 
 //some stuff for node.js
 var util = require("util");
@@ -16,9 +17,9 @@ var util = require("util");
 //core game variables
 var socket, players, 
 	flyingShapes,	//all flying shapes
-	conn;
+	countShapes=0;
 
-var MAX_NUM_SHAPES = 10, STANDARD_HEIGHT = 600, STANDARD_WIDTH=750;
+var MAX_NUM_SHAPES = 8,MIN_NUM_SHAPES = 0, STANDARD_HEIGHT = 600, STANDARD_WIDTH=750;
 
 function init(){
 	//initializing the players variable to an empty array
@@ -30,7 +31,7 @@ function init(){
 	//Tell the server to listen for incoming connections
     server.listen(gameport)
 	
-	//app should send index.html to the user
+	//app should send index.html to the user, when there is a connection
 	app.get( '/', function( req, res ){
         console.log('trying to load %s', __dirname + '/index.html');
         res.sendfile( '/index.html' , { root:__dirname });
@@ -84,7 +85,7 @@ function onSocketConnection(client){
 	client.on("new player", onNewPlayer);
 	client.on("move player", onMovePlayer);
 	client.on("move shape", sendFlyingShapesUpdate);
-	client.on("collision", onCollision);
+	client.on("remove shape", onCollision);
 	
 };
 
@@ -107,7 +108,7 @@ function onNewPlayer(data){
 	//creates a new player
 	var newPlayer = new Player(data.x, data.y, data.shapeid, data.name);
 	newPlayer.id = this.id;
-		conn=this;
+
 	//send client his number	
 	util.log("sending id to client:"+this.id);
 	this.emit("id info", {id: this.id }); 
@@ -161,13 +162,15 @@ function playerById(id){
 
 function addFlyingShapes(){	//for adding shapes to the array
 	
-	var num =Math.round(Math.random()*(10))+5;
+	var num =Math.round(Math.random()*(MAX_NUM_SHAPES))+MIN_NUM_SHAPES;
 	
 	for(i=0; i<num; i++){
 		var startX = Math.round(Math.random()*(STANDARD_WIDTH-5)),
 			startY = Math.round(Math.random()*(STANDARD_HEIGHT-5)),
-			initShape = Math.round(Math.random()*(3));
-		var newShape = new FlyingShapes(i,startX, startY, initShape);
+			initShape = Math.round(Math.random()*(3))
+			;
+		var newShape = new FlyingShapes(countShapes,startX, startY, initShape);
+		countShapes++;
 		flyingShapes.push(newShape);
 	};
 };
@@ -179,12 +182,30 @@ function sendFlyingShapes(client){
 		client.emit("add shape", {id: curr.getID(), x: curr.getX(), y: curr.getY(), shapeid: curr.getShapeID()});
 	};
 };
-
-function onCollision(data){
-util.log("Collision: "+data.id+" " +data.shapeid);
-
+function shapeById(id){
+	var i;
+	for(i=0; i<flyingShapes.length; i++){
+	util.log("check for id: "+flyingShapes[i].getID());
+		if(flyingShapes[i].getID() == id)
+			return flyingShapes[i];
+	};
+	return false;
 };
-//animation updates the flying shapes 
+function onCollision(data){
+	util.log("Collision: "+data.id+" " +data.shapeid);
+	
+	var removeShape = shapeById(data.shapeid);
+	//make sure that the shape to remove is found
+	if(!removeShape){
+		//util.log("shape not found: "+data.shapeid);
+		return;
+	};
+	//removing the shape from array
+	flyingShapes.splice(flyingShapes.indexOf(removeShape), 1);
+	this.broadcast.emit("remove shape", {id: data.shapeid});
+};
+
+//animation updates the flying shapes ******************
 function animate() {
 	update();
 	

@@ -18,6 +18,9 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 	var getShape = function(){
 		return shape;
 	};
+	var getID = function(){
+		return id;
+	};
 	var getShapeID = function(){
 		return shapeid;
 	};
@@ -62,6 +65,7 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 		getY: getY,
 		getShapeID: getShapeID,
 		getShape: getShape,
+		getID:getID,
 		setShape:setShape,
 		setX: setX,
 		setY: setY,

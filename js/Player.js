@@ -75,9 +75,10 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 			y += moveAmount;
 		}
 		
-		if(x>width)	x=0;
-		if(y>height) y=0;
-		
+		if(x>width+10)	x=0;
+		if(y>height+10) y=0;
+		if(x<-10) x= width;
+		if(y<-10)	y=height;
 		shape.setPosition(x,y);
 		
 		
