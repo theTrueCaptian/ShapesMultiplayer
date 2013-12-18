@@ -87,7 +87,7 @@ function onSocketConnection(client){
 	client.on("move player", onMovePlayer);
 	client.on("move shape", sendFlyingShapesUpdate);
 	client.on("remove shape", onCollision);
-	
+	socket.on("score update", onUpdateScoreBoard);
 };
 
 //functions that handle other events******************************
@@ -188,7 +188,7 @@ function addFlyingShapes(){	//for adding shapes to the array
 	for(i=0; i<num; i++){
 		var startX = Math.round(Math.random()*(STANDARD_WIDTH-5)),
 			startY = Math.round(Math.random()*(STANDARD_HEIGHT-5)),
-			initShape = Math.round(Math.random()*(3))
+			initShape = Math.round(Math.random()*(2))
 			;
 		var newShape = new FlyingShapes(countShapes,startX, startY, initShape);
 		countShapes++;
@@ -230,6 +230,21 @@ function onCollision(data){
 	//removing the shape from array
 	flyingShapes.splice(flyingShapes.indexOf(removeShape), 1);
 	this.broadcast.emit("remove shape", {id: data.shapeid});
+};
+
+//This function is called when "score update" message is received
+//The score board is updated
+function onUpdateScoreBoard(data){
+	var playerUpdate = playerById(data.id);
+	if(!playerUpdate){
+		util.log("Player with new score NOT FOUND "+data.id+" " + data.newscore);
+		return;
+	};
+	//set a new score
+	playerUpdate.setScore(newscore);
+	//Broadcast new score to everyone
+	util.log("Broadcast new score "+data.id+" " + data.newscore);
+	this.broadcast.emit("score update", {id: data.id, newscore: playerUpdate.getScore()});
 };
 
 //animation updates the flying shapes *******************************

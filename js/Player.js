@@ -11,7 +11,8 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 		moveAmount = 5,
 		id=setid,
 		shape,//sprite object
-		shapeid=inshapeid;//the shape of the player, 0 = square, 1 = circle, 2 = triangle	
+		shapeid=inshapeid,//the shape of the player, 0 = square, 1 = circle, 2 = triangle	
+		score=0;
 		
 	var getX = function(){
 		return x;
@@ -25,6 +26,9 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 	var getShapeID = function(){
 		return shapeid;
 	};
+	var getScore = function(){
+		return score;
+	};
 	var getName = function(){
 		return name;
 	};
@@ -36,6 +40,9 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 	};
 	var setY = function(newY){
 		y = newY;
+	};
+	var setScore = function(newScore){
+		score = newScore;
 	};
 	var setShape = function(){
 		//the shape of the player, 0 = square, 1 = circle, 2 = triangle
@@ -75,10 +82,10 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 			y += moveAmount;
 		}
 		
-		if(x>width+10)	x=shape.width/2;
-		if(y>height+10) y=shape.height/2;
-		if(x<-10) x= width-shape.width/2;
-		if(y<-10)	y=height-shape.height/2;
+		if(x>width)	x=width;
+		if(y>height) y=height;
+		if(x<0) x= 0;
+		if(y<0)	y=0;
 		shape.setPosition(x,y);
 		
 		
@@ -109,6 +116,8 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 		getShapeID: getShapeID,
 		getName:getName,
 		setID:setID,
+		getScore: getScore,
+		setScore: setScore,
 		setX: setX,
 		setY: setY,
 		setShape: setShape,

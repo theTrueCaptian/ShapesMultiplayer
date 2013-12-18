@@ -12,7 +12,6 @@ var width,
 	remotePlayers,  //the other players
 	flyingObjects,	//flying objects 
 	chatMode = false,	//chat mode (use enter to go into chat mode)
-	score = 0,
 	socket;			//socket variable
 
 var STANDARD_HEIGHT = 500, STANDARD_WIDTH=750,
@@ -32,7 +31,7 @@ function init() {
 	// placed right on the egde of the screen
 	var startX = Math.round(Math.random()*(game.width-5)),
 		startY = Math.round(Math.random()*(game.height-5)),
-		initshape = Math.round(Math.random()*(3));
+		initshape = Math.round(Math.random()*(2));
 
 	// Initialise the local player
 	localPlayer = new Player(0,startX, startY,initshape,"");
@@ -70,6 +69,8 @@ var setEventHandlers = function() {
 	socket.on("add shape", onAddShape);
 	socket.on("move shape", onMoveShape);
 	socket.on("remove shape", onRemoveShape);
+	socket.on("score update", onUpdateScoreBoard);
+	
 };
 
 // Browser window resize
@@ -137,6 +138,19 @@ function onRemovePlayer(data) {
 	};
 	//removing player from array
 	remotePlayers.splice(remotePlayers.indexOf(removePlayer), 1);
+	
+};
+
+//This function is called when "score update" message is received
+//The score board is updated
+function onUpdateScoreBoard(data){
+	console.log("score update: "+data.id+" " + data.newscore);
+	var playerUpdate = playerById(data.id);
+	if(!playerUpdate){
+		return;
+	};
+	//set a new score
+	playerUpdate.setScore(data.newscore);
 	
 };
 
@@ -221,13 +235,14 @@ function checkCollision(){
 		if(localPlayer.getShape().collidesWith(flyingObject[i].getShape())){
 			//give points to the player
 			if(flyingObject[i].getShapeID()==localPlayer.getShapeID()){	//check if the shapes are same, then give points
-				score = score + POINTS_INC;
+				localPlayer.setScore(localPlayer.getScore() + POINTS_INC);
 				drawpoint(POINTS_INC, flyingObject[i].getX(), flyingObject[i].getY());
 			}else{
-				score = score + POINTS_DEC;	//else takes points off
+				localPlayer.setScore(localPlayer.getScore() + POINTS_DEC);	//else takes points off
 				drawpoint(POINTS_DEC, flyingObject[i].getX(), flyingObject[i].getY());
 			};
-			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID(), newscore: score});
+			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID()});
+			socket.emit("score update", {id: localPlayer.getID(), newscore: localPlayer.getScore()});
 			console.log("collision! shape:"+flyingObject[i].getID()+" player:"+localPlayer.getID());
 			
 			
@@ -251,13 +266,13 @@ function draw() {
 	
 	//draw the score
 	game.context.font = ' 15pt Arial';
-	game.context.fillText("Score: "+score, STANDARD_WIDTH-150, 40);			
+	game.context.fillText("Score: "+localPlayer.getScore(), STANDARD_WIDTH-150, 40);			
 };
 
 //Draws the points that the player earned or lost during collision
 function drawpoint(inc, x, y){
 	game.context.font = ' 15pt Arial';
-	game.context.fillText("Score: "+score, x, y);		
+	game.context.fillText(" "+inc, x, y);		
 };
 
 //helper functions******************************************
