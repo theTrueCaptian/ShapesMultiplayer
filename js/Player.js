@@ -90,6 +90,7 @@ var Player = function(setid,startX, startY, inshapeid, inname) {
 		if(shape!=null){ //check if drawing something that is undefined
 			
 			shape.setPosition(x, y);
+			scene.context.font = ' 10pt Arial';
 			scene.context.fillText(name+" "+id, x-(shape.width), y+shape.height);
 			//update the sprite
 			shape.update();

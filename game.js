@@ -19,7 +19,7 @@ var socket, players,
 	flyingShapes,	//all flying shapes
 	countShapes=0;	//this is used to count total of shapes (including non active ones), and used for shapes unique id
 
-var MAX_NUM_SHAPES = 10,MIN_NUM_SHAPES = 5, STANDARD_HEIGHT = 600, STANDARD_WIDTH=750;
+var MAX_NUM_SHAPES = 10,MIN_NUM_SHAPES = 5, STANDARD_HEIGHT = 500, STANDARD_WIDTH=750;
 
 //Initializing server/game
 function init(){

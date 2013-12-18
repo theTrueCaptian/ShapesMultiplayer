@@ -6,7 +6,8 @@ var Player = function(startX, startY, inshapeid, inname){
 	y = startY,
 	shapeid = inshapeid, //the shape of the player, 0 = square, 1 = circle, 2 = triangle	
 	id,	//unique id of a player
-	name = inname;
+	name = inname, 
+	score;	//score of the user
 	
 	var getX = function(){
 		return x;

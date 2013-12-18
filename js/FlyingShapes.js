@@ -53,7 +53,7 @@ var FlyingShapes = function(startid,startX, startY, inshapeid){
 		if(shape!=null){ //check if drawing something that is undefined
 			
 			shape.setPosition(x, y);
-			scene.context.fillText(" "+id, x, y+shape.height);
+			//scene.context.fillText(" "+id, x, y+shape.height);
 			//update the sprite
 			shape.update();
 		}else{//if it is undefined, then define it

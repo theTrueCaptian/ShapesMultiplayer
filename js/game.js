@@ -12,9 +12,11 @@ var width,
 	remotePlayers,  //the other players
 	flyingObjects,	//flying objects 
 	chatMode = false,	//chat mode (use enter to go into chat mode)
+	score = 0,
 	socket;			//socket variable
 
-var STANDARD_HEIGHT = 600, STANDARD_WIDTH=750;
+var STANDARD_HEIGHT = 500, STANDARD_WIDTH=750,
+	POINTS_INC = 10, POINTS_DEC = -5;
 
 /**************************************************
 ** GAME INITIALISATION
@@ -203,15 +205,7 @@ function update() {
 	socket.emit("move shape", {id: localPlayer.getID()});
 	
 	//check for collisions
-	var i;
-	for(i=0; i<flyingObject.length; i++){
-		if(localPlayer.getShape().collidesWith(flyingObject[i].getShape())){
-			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID()});
-			console.log("collision! shape:"+flyingObject[i].getID()+" player:"+localPlayer.getID());
-			onRemoveShape({id:flyingObject[i].getID()});
-			break;
-		}
-	};
+	checkCollision();
 	
 	//check if chat mode is on
 	//if(!chatMode &&){
@@ -221,7 +215,27 @@ function update() {
 	draw();
 };
 
-
+function checkCollision(){
+	var i;
+	for(i=0; i<flyingObject.length; i++){
+		if(localPlayer.getShape().collidesWith(flyingObject[i].getShape())){
+			//give points to the player
+			if(flyingObject[i].getShapeID()==localPlayer.getShapeID()){	//check if the shapes are same, then give points
+				score = score + POINTS_INC;
+				drawpoint(POINTS_INC, flyingObject[i].getX(), flyingObject[i].getY());
+			}else{
+				score = score + POINTS_DEC;	//else takes points off
+				drawpoint(POINTS_DEC, flyingObject[i].getX(), flyingObject[i].getY());
+			};
+			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID(), newscore: score});
+			console.log("collision! shape:"+flyingObject[i].getID()+" player:"+localPlayer.getID());
+			
+			
+			onRemoveShape({id:flyingObject[i].getID()});
+			break;
+		}
+	};
+};
 /**************************************************
 ** GAME DRAW
 **************************************************/
@@ -234,13 +248,22 @@ function draw() {
 	for(i=0; i<remotePlayers.length; i++){
 		remotePlayers[i].draw(game);
 	};
+	
+	//draw the score
+	game.context.font = ' 15pt Arial';
+	game.context.fillText("Score: "+score, STANDARD_WIDTH-150, 40);			
+};
+
+//Draws the points that the player earned or lost during collision
+function drawpoint(inc, x, y){
+	game.context.font = ' 15pt Arial';
+	game.context.fillText("Score: "+score, x, y);		
 };
 
 //helper functions******************************************
 function playerById(id){
 	var i;
 	for(i=0; i<remotePlayers.length; i++){
-		//console.log("remote player checking: "+remotePlayers[i].getID());
 		if(remotePlayers[i].getID() == id){
 			return remotePlayers[i];
 		}
