@@ -225,7 +225,8 @@ function update() {
 	
 	draw();
 };
-
+//Check if the player hits any flying shapes
+//If so, then change score, and tell server about it
 function checkCollision(){
 	var i;
 	for(i=0; i<flyingObject.length; i++){
@@ -240,8 +241,7 @@ function checkCollision(){
 			};
 			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID()});
 			socket.emit("score update", {id: localPlayer.getID(), newscore: localPlayer.getScore()});
-			console.log("Player with new score "+localPlayer.getID()+" " + localPlayer.getScore());
-			
+			//console.log("Player with new score "+localPlayer.getID()+" " + localPlayer.getScore());
 			
 			onRemoveShape({id:flyingObject[i].getID()});
 			break;

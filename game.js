@@ -243,7 +243,7 @@ function onUpdateScoreBoard(data){
 	//set a new score
 	playerUpdate.setScore(data.newscore);
 	//Broadcast new score to everyone
-	util.log("Broadcast new score "+data.id+" " + data.newscore);
+	//util.log("Broadcast new score "+data.id+" " + data.newscore);
 	this.broadcast.emit("score update", {id: data.id, newscore: playerUpdate.getScore()});
 };
 
