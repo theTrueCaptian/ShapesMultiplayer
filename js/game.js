@@ -285,14 +285,9 @@ function draw() {
 
 //Draws the points that the player earned or lost during collision
 function drawpoint(inc, x, y, shapeid, w, h){
-	game.context.font = '15pt Arial';
-	game.context.fillText(" "+inc, x, y);	
-	//setting animation for the collided object
-	//setTimeout(function(){
-		//game.context.drawImage(img,x,y,w,h);
-		w--;
-		h--;
-	//},50);
+	var point = new CollidedObject(x, y, inc+"", game.context);
+	point.draw();
+	
 };
 
 //helper functions******************************************
