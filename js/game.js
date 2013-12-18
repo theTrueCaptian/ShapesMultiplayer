@@ -129,9 +129,11 @@ function onRemovePlayer(data) {
 function onAddShape(data){
 	console.log("new shape: "+data.id);
 	//creating a new shape based on the position data from the server
-	var newShape = new FlyingShapes(data.id, data.x, data.y, data.shapeid);
-	newShape.setShape();
-	flyingObject.push(newShape);
+	if(!shapeById(data.id)){	//make sure doesn't already know about the existence of this particular shape
+		var newShape = new FlyingShapes(data.id, data.x, data.y, data.shapeid);
+		newShape.setShape();
+		flyingObject.push(newShape);
+	};
 };
 
 function onMoveShape(data){

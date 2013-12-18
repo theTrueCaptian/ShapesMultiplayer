@@ -184,8 +184,8 @@ function addFlyingShapes(){	//for adding shapes to the array
 function sendFlyingShapes(client){
 	for(i=0; i<flyingShapes.length; i++){
 		var curr = flyingShapes[i];
-		//send a message to the client we are dealing with
-		client.emit("add shape", {id: curr.getID(), x: curr.getX(), y: curr.getY(), shapeid: curr.getShapeID()});
+		//send all flying shapes to all clients
+		client.broadcast.emit("add shape", {id: curr.getID(), x: curr.getX(), y: curr.getY(), shapeid: curr.getShapeID()});
 	};
 };
 function shapeById(id){
