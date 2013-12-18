@@ -6,23 +6,14 @@ View the live here:
 http://csc563maeda.herokuapp.com
 
 
+## To setup and run locally:
 
-## Getting started (Using npm package.json)
-* Get node.js
-* run `npm install` inside the cloned folder
-* run `node app.js` inside the cloned folder
-* Visit http://127.0.0.1:4004/?debug
-
-## Getting started (Manual install)
-
-* Get node.js
+* Install Heroku
+* Run Git Bash (comes with Heroku) and navigate to the project folder distprog1
 * Install socket.io `npm install socket.io`
-* Install node-udid `npm install node-uuid`
 * Install express `npm install express`
-* Run `node app.js` inside the cloned folder
-* Visit http://127.0.0.1:4004/?debug
+* Run 'node game.js'
+* Visit localhost:8080
 
-## License
 
-MIT Licensed. 
-See LICENSE if required.
+

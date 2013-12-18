@@ -232,10 +232,11 @@ function update() {
 	draw();
 };
 function playSound(type){
-	var index = Math.round(Math.random()*(soundArray.length-1));
 	if(type=="kill"){
 		soundArray[3].play();
 	}else{
+		var index = Math.round(Math.random()*(soundArray.length-2));
+	
 		soundArray[index].play();
 	}
 
