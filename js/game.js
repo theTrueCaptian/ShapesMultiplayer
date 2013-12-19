@@ -286,6 +286,9 @@ function checkCollision(){
 function draw() {
 	if(initmode){	//ask user for the username and show instructions and loading screen	
 		game.context.drawImage(instructions, STANDARD_WIDTH/2 -instructions.width/2, STANDARD_HEIGHT/2 -instructions.height/2, STANDARD_WIDTH/2, STANDARD_HEIGHT/2);
+		//draw the loading message
+		game.context.font = ' 15pt Arial';
+		game.context.fillText("Loading...", STANDARD_WIDTH/2-50, STANDARD_HEIGHT/2 +instructions.height/2);
 	}else{
 		// Draw the local player
 		localPlayer.draw(game);
