@@ -5,7 +5,6 @@ CSC536 Final Project: Multiplayer Game In Node.js
 View the live here:
 http://csc536maeda.herokuapp.com
 
-
 ## To setup and run locally:
 
 * Install Heroku
