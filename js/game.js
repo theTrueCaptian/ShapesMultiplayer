@@ -13,6 +13,7 @@ var width,
 	flyingObjects,	//flying objects 
 	collidedObjects, //array of collided objects
 	soundArray,		//all the sounds used for collision
+	instructions,	//instructions image
 	initmode = true,	//init mode ask user for the username and show instructions and loading screen
 	chatMode = false,	//chat mode (use enter to go into chat mode)
 	socket;			//socket variable
@@ -31,6 +32,7 @@ function init() {
 	
 	//load sound
 	loadSound();
+	loadImg();
 	
 	// Calculate a random start position for the local player
 	// The minus 5 (half a player size) stops the player being
@@ -43,7 +45,15 @@ function init() {
 	localPlayer = new Player(0,startX, startY,initshape,"");
 	localPlayer.setShape();
 	
+	//game start
+	game.start();
+	
+	//show instructions	
 	draw();
+	setTimeout(function(){
+		if(initmode)
+			initmode = false;	// set the instructions off after 5 secs
+	},10000);
 	
 	connect();	//finally connect to server
 	
@@ -110,10 +120,6 @@ function onReceiveID(data){
 	//set this client's id
 	localPlayer.setID(data.id);
 	
-	//game start
-	game.start();
-	//turn initmode off
-	initmode = false;
 };
 
 //When a new player connects to the server, the client will receive a "new player" message 
@@ -211,8 +217,6 @@ function update() {
 	
 	if(initmode){	//ask user for the username and show instructions and loading screen
 	
-		
-		
 	}else{	//if it is not initialization mode, update with game loop code
 		localPlayer.update(STANDARD_WIDTH, STANDARD_HEIGHT);
 		//update the server on my position only on change
@@ -238,10 +242,6 @@ function update() {
 		//check for collisions
 		checkCollision();
 		
-		//check if chat mode is on
-		//if(!chatMode &&){
-		
-		//}
 	}	
 	draw();
 };
@@ -271,9 +271,10 @@ function checkCollision(){
 				localPlayer.setScore(localPlayer.getScore() + POINTS_DEC);	//else takes points off
 				drawpoint(POINTS_DEC, flyingObject[i].getX(), flyingObject[i].getY(), flyingObject[i].getShapeID(), flyingObject[i].getShape().width, flyingObject[i].getShape().height);
 			};
+			//tell server to remove shape and update player's score
 			socket.emit("remove shape", {id: localPlayer.getID(), shapeid: flyingObject[i].getID()});
 			socket.emit("score update", {id: localPlayer.getID(), newscore: localPlayer.getScore()});
-			
+			//finally remove the shape
 			onRemoveShape({id:flyingObject[i].getID()});
 			break;
 		}
@@ -283,9 +284,8 @@ function checkCollision(){
 ** GAME DRAW
 **************************************************/
 function draw() {
-	if(initmode){	//ask user for the username and show instructions and loading screen
-		game.context.drawImage("js/images/instructions.png", 0, 0, STANDARD_WIDTH, STANDARD_HEIGHT);
-					
+	if(initmode){	//ask user for the username and show instructions and loading screen	
+		game.context.drawImage(instructions, STANDARD_WIDTH/2 -instructions.width/2, STANDARD_HEIGHT/2 -instructions.height/2, STANDARD_WIDTH/2, STANDARD_HEIGHT/2);
 	}else{
 		// Draw the local player
 		localPlayer.draw(game);
@@ -300,7 +300,7 @@ function draw() {
 		game.context.font = ' 15pt Arial';
 		game.context.fillText("Score: "+localPlayer.getScore(), STANDARD_WIDTH-150, 40);
 	
-	}
+	};
 };
 
 //Draws the points that the player earned or lost during collision
@@ -336,4 +336,10 @@ function loadSound(){
 	soundArray[1] = new Sound("js/sound/sound2.ogg");
 	soundArray[2] = new Sound("js/sound/sound3.ogg");
 	soundArray[3] = new Sound("js/sound/sound4.ogg");
+};
+function loadImg(){
+	instructions = new Image();
+	instructions.src = "js/images/instructions.png";
+	instructions.width = STANDARD_WIDTH/2, 
+	instructions.height = STANDARD_HEIGHT/2;
 };
