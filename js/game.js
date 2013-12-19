@@ -43,8 +43,9 @@ function init() {
 	localPlayer = new Player(0,startX, startY,initshape,"");
 	localPlayer.setShape();
 	
-	//game start
-	game.start();
+	draw();
+	
+	connect();	//finally connect to server
 	
 	remotePlayers = [];
 	flyingObject=[];
@@ -108,6 +109,9 @@ function onReceiveID(data){
 	console.log("received my id:"+data.id);
 	//set this client's id
 	localPlayer.setID(data.id);
+	
+	//game start
+	game.start();
 	//turn initmode off
 	initmode = false;
 };
@@ -207,9 +211,7 @@ function update() {
 	
 	if(initmode){	//ask user for the username and show instructions and loading screen
 	
-		//once done
-		//init = false;
-		connect();	//finally connect to server
+		
 		
 	}else{	//if it is not initialization mode, update with game loop code
 		localPlayer.update(STANDARD_WIDTH, STANDARD_HEIGHT);
@@ -282,7 +284,7 @@ function checkCollision(){
 **************************************************/
 function draw() {
 	if(initmode){	//ask user for the username and show instructions and loading screen
-		game.context.image("js/images/instructions.png", 0, 0, STANDARD_WIDTH, STANDARD_HEIGHT);
+		game.context.drawImage("js/images/instructions.png", 0, 0, STANDARD_WIDTH, STANDARD_HEIGHT);
 					
 	}else{
 		// Draw the local player
