@@ -163,7 +163,6 @@ function onRemovePlayer(data) {
 //This function is called when "score update" message is received
 //The score board is updated
 function onUpdateScoreBoard(data){
-	console.log("score update: "+data.id+" " + data.newscore);
 	var playerUpdate = playerById(data.id);
 	if(!playerUpdate){
 		return;
@@ -303,12 +302,20 @@ function draw() {
 		game.context.font = ' 15pt Arial';
 		game.context.fillText("Score: "+localPlayer.getScore(), STANDARD_WIDTH-150, 40);
 		
-		var i;
-		for(i=0; i<remotePlayers.length; i++){
-			remotePlayers[i].draw(game);
-			game.context.font = ' 5pt Arial';
-			game.context.fillText(remotePlayers[i].getName()+": "+remotePlayers[i].getScore(), STANDARD_WIDTH-150, 40+10*remotePlayers[i]);
-		};
+		//draw scoreboard
+		if(remotePlayers.length==0){
+			game.context.font = ' 8pt Arial';
+			game.context.fillText("No players online...", STANDARD_WIDTH-150, 60);
+		}else{
+			game.context.font = ' 8 Arial';
+			game.context.fillText("Scoreboard", STANDARD_WIDTH-150, 80);
+			var i;
+			for(i=0; i<remotePlayers.length; i++){
+				game.context.font = ' 8pt Arial';
+				//console.log("score update: "+remotePlayers[i].getID()+": "+remotePlayers[i].getScore()+" "+(40+10*i));
+				game.context.fillText(remotePlayers[i].getID()+": "+remotePlayers[i].getScore(), STANDARD_WIDTH-150, 80+10*(1+i));
+			};
+		}
 	};
 };
 
