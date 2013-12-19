@@ -37,8 +37,8 @@ function init() {
 	// Calculate a random start position for the local player
 	// The minus 5 (half a player size) stops the player being
 	// placed right on the egde of the screen
-	var startX = Math.round(Math.random()*(game.width-5)),
-		startY = Math.round(Math.random()*(game.height-5)),
+	var startX = Math.round(Math.random()*(game.width-50)),
+		startY = Math.round(Math.random()*(game.height-50)),
 		initshape = Math.round(Math.random()*(2));
 
 	// Initialise the local player
