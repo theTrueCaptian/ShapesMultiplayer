@@ -288,7 +288,7 @@ function draw() {
 		game.context.drawImage(instructions, STANDARD_WIDTH/2 -instructions.width/2, STANDARD_HEIGHT/2 -instructions.height/2, STANDARD_WIDTH/2, STANDARD_HEIGHT/2);
 		//draw the loading message
 		game.context.font = ' 15pt Arial';
-		game.context.fillText("Loading...", STANDARD_WIDTH/2-50, STANDARD_HEIGHT/2 +instructions.height/2);
+		game.context.fillText("Loading...", STANDARD_WIDTH/2-50, STANDARD_HEIGHT/2 +instructions.height-10);
 	}else{
 		// Draw the local player
 		localPlayer.draw(game);
@@ -302,7 +302,13 @@ function draw() {
 		//draw the score
 		game.context.font = ' 15pt Arial';
 		game.context.fillText("Score: "+localPlayer.getScore(), STANDARD_WIDTH-150, 40);
-	
+		
+		var i;
+		for(i=0; i<remotePlayers.length; i++){
+			remotePlayers[i].draw(game);
+			game.context.font = ' 5pt Arial';
+			game.context.fillText(remotePlayers[i].getName()+": "+remotePlayers[i].getScore(), STANDARD_WIDTH-150, 40+10*remotePlayers[i]);
+		};
 	};
 };
 

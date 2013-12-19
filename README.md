@@ -13,7 +13,7 @@ http://csc563maeda.herokuapp.com
 * Install socket.io `npm install socket.io`
 * Install express `npm install express`
 * Run 'node game.js'
-* Visit localhost:8080
+* Visit localhost:8000
 
 
 
