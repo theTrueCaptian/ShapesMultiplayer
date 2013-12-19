@@ -13,6 +13,7 @@ var width,
 	flyingObjects,	//flying objects 
 	collidedObjects, //array of collided objects
 	soundArray,		//all the sounds used for collision
+	initmode = true,	//init mode ask user for the username and show instructions and loading screen
 	chatMode = false,	//chat mode (use enter to go into chat mode)
 	socket;			//socket variable
 
@@ -42,19 +43,21 @@ function init() {
 	localPlayer = new Player(0,startX, startY,initshape,"");
 	localPlayer.setShape();
 	
-	socket = io.connect();
-	
 	//game start
 	game.start();
-	
-	// Start listening for events
-	setEventHandlers();
 	
 	remotePlayers = [];
 	flyingObject=[];
 	collidedObjects = [];
 };
 
+var connect = function(){
+	//connecting
+	socket = io.connect();
+		
+	// Start listening for events
+	setEventHandlers();
+};
 
 /**************************************************
 ** GAME EVENT HANDLERS
@@ -105,7 +108,8 @@ function onReceiveID(data){
 	console.log("received my id:"+data.id);
 	//set this client's id
 	localPlayer.setID(data.id);
-	
+	//turn initmode off
+	initmode = false;
 };
 
 //When a new player connects to the server, the client will receive a "new player" message 
@@ -200,35 +204,43 @@ function onRemoveShape(data) {
 **************************************************/
 function update() {
 	game.clear();
-	localPlayer.update(STANDARD_WIDTH, STANDARD_HEIGHT);
-	//update the server on my position only on change
-	if(localPlayer.update()){
-		socket.emit("move player", {id: localPlayer.getID(), x: localPlayer.getX(), y: localPlayer.getY(), shapeid: localPlayer.getShapeID()});
-	};
 	
-	//draw all remote players to canvas
-	var i;
-	for(i=0; i<remotePlayers.length; i++){
-		remotePlayers[i].draw(game);
-	};
+	if(initmode){	//ask user for the username and show instructions and loading screen
 	
-	//draw all flying shapes to canvas
-	var i;
-	for(i=0; i<flyingObject.length; i++){
-		flyingObject[i].draw(game);
-	};
-	
-	//alert server to send updates shapes coordinates
-	socket.emit("move shape", {id: localPlayer.getID()});
-	
-	//check for collisions
-	checkCollision();
-	
-	//check if chat mode is on
-	//if(!chatMode &&){
-	
-	//}
-	
+		//once done
+		//init = false;
+		connect();	//finally connect to server
+		
+	}else{	//if it is not initialization mode, update with game loop code
+		localPlayer.update(STANDARD_WIDTH, STANDARD_HEIGHT);
+		//update the server on my position only on change
+		if(localPlayer.update()){
+			socket.emit("move player", {id: localPlayer.getID(), x: localPlayer.getX(), y: localPlayer.getY(), shapeid: localPlayer.getShapeID()});
+		};
+		
+		//draw all remote players to canvas
+		var i;
+		for(i=0; i<remotePlayers.length; i++){
+			remotePlayers[i].draw(game);
+		};
+		
+		//draw all flying shapes to canvas
+		var i;
+		for(i=0; i<flyingObject.length; i++){
+			flyingObject[i].draw(game);
+		};
+		
+		//alert server to send updates shapes coordinates
+		socket.emit("move shape", {id: localPlayer.getID()});
+		
+		//check for collisions
+		checkCollision();
+		
+		//check if chat mode is on
+		//if(!chatMode &&){
+		
+		//}
+	}	
 	draw();
 };
 function playSound(type){
@@ -269,18 +281,24 @@ function checkCollision(){
 ** GAME DRAW
 **************************************************/
 function draw() {
-	// Draw the local player
-	localPlayer.draw(game);
+	if(initmode){	//ask user for the username and show instructions and loading screen
+		game.context.image("js/images/instructions.png", 0, 0, STANDARD_WIDTH, STANDARD_HEIGHT);
+					
+	}else{
+		// Draw the local player
+		localPlayer.draw(game);
+		
+		//draw all remote players to canvas
+		var i;
+		for(i=0; i<remotePlayers.length; i++){
+			remotePlayers[i].draw(game);
+		};
+		
+		//draw the score
+		game.context.font = ' 15pt Arial';
+		game.context.fillText("Score: "+localPlayer.getScore(), STANDARD_WIDTH-150, 40);
 	
-	//draw all remote players to canvas
-	var i;
-	for(i=0; i<remotePlayers.length; i++){
-		remotePlayers[i].draw(game);
-	};
-	
-	//draw the score
-	game.context.font = ' 15pt Arial';
-	game.context.fillText("Score: "+localPlayer.getScore(), STANDARD_WIDTH-150, 40);			
+	}
 };
 
 //Draws the points that the player earned or lost during collision
