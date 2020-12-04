@@ -1,5 +1,5 @@
 # CSC536 Final Project: Multiplayer Game In Node.js (2013)
-=============================
+===
 
 Play live here: <http://csc536maeda.herokuapp.com>
 
